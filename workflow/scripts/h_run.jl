@@ -23,14 +23,11 @@ arg2_range = 10.0 .^ (-5:1:4)
 # Generate the runs
 hruns = generate_hruns(arg1_range, arg2_range)
 
-# Loop through each run
-for (arg1, arg2, arg3, arg4) in hruns
-    # Build the command
-    command = `julia ./scripts/h_sans_beta.jl $arg1 $arg2 $arg3 $arg4`
+# Build the command
+command = `julia ./scripts/h_sans_beta.jl`
 
-    println("Running: ", command)
-    run(command)
-end
+println("Running: ", command)
+run(command)
 
 # More parameter extraction
 open(joinpath(output_dir, "hruns.json"), "w") do file
