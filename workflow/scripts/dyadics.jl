@@ -64,7 +64,7 @@ marker_file = joinpath(output_dir, "derivatives_done.marker")
 if !isfile(marker_file)
     println("Running numerical derivatives calculator...")
 
-    function_names = generate_all_finite_differences(n_order, n_stencil)
+    function_names = generate_all_finite_differences(n_stencil)
 
     gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
     

@@ -11,7 +11,8 @@ function calc_dyadics_over_beta(β)
 end
 
 # Creation of Taylor's expansion and their respective coefficients
-function generate_finite_difference_general(order::Int, num_stencils::Int, function_name::String)
+function generate_all_finite_differences(num_stencils::Int)
+    max_order = num_stencils-1 
     # Ensure num_stencils is even and valid
     if num_stencils % 2 != 0 || num_stencils < 2
         error("num_stencils must be an even number greater than or equal to 2")
@@ -25,72 +26,57 @@ function generate_finite_difference_general(order::Int, num_stencils::Int, funct
     # Number of stencil points
     n = length(stencil_points)
 
-    # Ensure derivative order is valid
-    if order >= n
-        error("The derivative order must be less than the number of stencil points.")
-    end
-
     # Build the matrix A dynamically
     A = [stencil_points[j]^(i - 1) / factorial(i - 1) for i in 1:n, j in 1:n]
 
-    # Target vector for the derivative
-    b = zeros(n)
-    b[order + 1] = 1.0  # Encode the derivative order
-
-    # Solve for coefficients
-    c = A \ b
-
-    # Symmetry handling for odd-order derivatives (like first derivative)
-    if order % 2 == 1
-        # Odd-order: ensure coefficients respect asymmetry
-        for i in 1:n
-            if stencil_points[i] < 0
-                c[i] = -c[findfirst(x -> x == -stencil_points[i], stencil_points)]
-            end
-        end
-    else
-        # Even-order: ensure coefficients respect symmetry
-        c = (c .+ reverse(c)) / 2
-    end
-
-    # build each term as an expression: c[i] * g(stencil_points[i] * h)
-    terms_expr = [:( $(c[i]) * g($(stencil_points[i]) * h) ) for i in 1:n]
-
-    # sum of terms (handle n == 1 safely)
-    sum_expr = n == 1 ? terms_expr[1] : reduce((a, b) -> :($a + $b), terms_expr)
-
-    # denominator expression
-    denominator_expr = order == 0 ? :(1) : :(h^$(order))
-
-    # full function expression using :(...) and interpolation
-    expr = :(
-        function $(Symbol(function_name))(g, h)
-            return $sum_expr / $denominator_expr
-        end
-    )
-    eval(expr)
-
-    return
-end
-
-# Generate the functions up to nth order with n strencils (defined within the input parameters as arguments 4 and 5)
-function generate_all_finite_differences(max_order::Int, stencil::Int, prefix="g")
-    function_names = String[]  # To store the names of generated functions
-
+    function_expressions = []
+    function_names = String[]
     for order in 0:max_order
-        function_name = "$(prefix)$(order)_approx"
+        function_name = "g$(order)_approx"
+        # Target vector for the derivative
+        b = zeros(n)
+        b[order + 1] = 1.0  # Encode the derivative order
+
+        # Solve for coefficients
+        c = A \ b
+
+        # Symmetry handling for odd-order derivatives (like first derivative)
+        if order % 2 == 1
+            # Odd-order: ensure coefficients respect asymmetry
+            for i in 1:n
+                if stencil_points[i] < 0
+                    c[i] = -c[findfirst(x -> x == -stencil_points[i], stencil_points)]
+                end
+            end
+        else
+            # Even-order: ensure coefficients respect symmetry
+            c = (c .+ reverse(c)) / 2
+        end
+
+        # build each term as an expression: c[i] * g(stencil_points[i] * h)
+        terms_expr = [:( $(c[i]) * g($(stencil_points[i]) * h) ) for i in 1:n]
+
+        # sum of terms (handle n == 1 safely)
+        sum_expr = n == 1 ? terms_expr[1] : reduce((a, b) -> :($a + $b), terms_expr)
+
+        # denominator expression
+        denominator_expr = order == 0 ? :(1) : :(h^$(order))
+
+        # full function expression using :(...) and interpolation
+        expr = :(
+            function $(Symbol(function_name))(g, h)
+                return $sum_expr / $denominator_expr
+            end
+        )
+        push!(function_expressions, expr)
         push!(function_names, function_name)
-
-        # Dynamically generate the finite difference function
-        generate_finite_difference_general(order, stencil, function_name)
     end
+    combined = Expr(:block, function_expressions...)
 
-    return function_names    # now contains names like "g0_approx", "g1_approx", "g2_approx", etc.
+    eval(combined)
+
+    return function_names
 end
-
-# Test
-#function_names = generate_all_finite_differences(n_order, n_stencil)
-#println(function_names)
 
 function generate_gk_values(function_names::Vector{String}, calc_dyadics_over_beta::Function, h::Float64)
     gk_values = []  # To store the function results and preserve order

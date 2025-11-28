@@ -60,7 +60,7 @@ Sans_beta = ParaMag.JJbeta(shparam)
 Sans_beta2 = ParaMag.JJbeta2(shparam)
 Sans_beta3 = ParaMag.JJbeta3(shparam)
 
-function_names = generate_all_finite_differences(n_order, n_stencil)
+function_names = generate_all_finite_differences(n_stencil)
 
 gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
 
