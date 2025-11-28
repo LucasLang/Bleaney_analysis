@@ -53,21 +53,24 @@ function generate_finite_difference_general(order::Int, num_stencils::Int, funct
         c = (c .+ reverse(c)) / 2
     end
 
-    # Generate the finite difference formula as Julia code
-    terms = [string(c[i], " * g(", stencil_points[i], "*h)") for i in 1:n]
-    numerator = join(terms, " + ")
-    denominator = order == 0 ? "1" : "(h^$order)"
-    function_code = """
-    function $function_name(g, h)
-        return ($numerator) / $denominator
-    end
-    """
+    # build each term as an expression: c[i] * g(stencil_points[i] * h)
+    terms_expr = [:( $(c[i]) * g($(stencil_points[i]) * h) ) for i in 1:n]
 
-    # Evaluate the function in the current module
-    eval(Meta.parse(function_code))
+    # sum of terms (handle n == 1 safely)
+    sum_expr = n == 1 ? terms_expr[1] : reduce((a, b) -> :($a + $b), terms_expr)
 
-    # Return useful results
-    return stencil_points, c, function_code
+    # denominator expression
+    denominator_expr = order == 0 ? :(1) : :(h^$(order))
+
+    # full function expression using :(...) and interpolation
+    expr = :(
+        function $(Symbol(function_name))(g, h)
+            return $sum_expr / $denominator_expr
+        end
+    )
+    eval(expr)
+
+    return
 end
 
 # Generate the functions up to nth order with n strencils (defined within the input parameters as arguments 4 and 5)
