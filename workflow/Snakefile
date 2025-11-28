@@ -1,0 +1,108 @@
+import os
+from glob import glob
+
+# Access arguments passed via --config in Snakemake
+arg1 = config.get("arg1", None)
+arg2 = config.get("arg2", None)
+arg3 = config.get("arg3", None)
+
+# Conditionally set workflow mode based on arguments
+if arg1 is not None and arg2 is not None and arg3 is not None:
+    workflow_mode = "TM"
+else:
+    workflow_mode = "Ln"
+
+wildcards_detected = glob_wildcards("data/Bkq_{ln}_real")   # this will give a list of strings containing the lanthanides
+
+# Check if any Bkq_*_real files exist
+bkq_check = bool(glob("data/Bkq_*_real"))
+
+rule all:
+    input: 
+        expand("results/error_analysis_plot.png", ln=wildcards_detected.ln)  # the wildcards are not expanded into the string: only one input required?
+
+if workflow_mode == "TM":
+    rule TM_workflow:
+        output:
+            "data/spin_dyadics_input.txt",
+            "data/S.txt",
+            "data/D.txt",
+            "data/T.txt",
+            "data/ratio.txt"
+        shell:
+            "julia scripts/new_DTensor_func.jl {arg1} {arg2} {arg3} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]}"
+
+if workflow_mode == "Ln" or not bkq_check: 
+    rule optimise_h:
+        input:
+            lambda wildcards: next(
+                (f for f in glob("data/Bkq_*_real")), 
+                ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
+            )
+        output:
+            "results/h_norm1.txt",
+            "results/h_norm2.txt",
+            "results/h_norm3.txt",
+            "results/hruns.json"
+        log:
+            "logs/optimise_h.log"
+        shell:
+            "julia scripts/h_run.jl {input} {output[0]} {output[1]} {output[2]} {output[3]}"
+
+rule h_plot:
+    input:
+        "results/h_norm1.txt",
+        "results/h_norm2.txt",
+        "results/h_norm3.txt",
+        "results/hruns.json"
+    output:
+        "results/h_plot.png",
+        "results/optimal_h_values.txt",
+        "results/plot_data.txt"
+    log:
+        "logs/h_plot.log"
+    conda:
+        "envs/matplotlib.yaml"
+    shell:
+        "python scripts/h2_plots.py {input} {output[0]} {output[1]} {output[2]}"
+
+rule calc_run:
+    input:
+        lambda wildcards: next(
+            (f for f in glob("data/Bkq_*_real")), 
+            ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
+        ),
+        "results/optimal_h_values.txt"
+    output:
+        "results/derivatives_results.jld2",
+        "results/derivatives_done.marker",
+        "results/diff_norm1.txt",
+        "results/diff_norm2.txt",
+        "results/diff_norm3.txt",
+        "results/diff_norm4.txt",
+        "results/diff_norm5.txt",
+        "results/diff_norm6.txt",
+        "results/runs.json"
+    log:
+        "logs/calc_run.log"
+    shell:
+        "julia scripts/job_run_{workflow_mode}.jl {input} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]} {output[5]} {output[6]} {output[7]} {output[8]}"
+
+rule dyadic_plot:
+    input:
+        "results/diff_norm1.txt",
+        "results/diff_norm2.txt",
+        "results/diff_norm3.txt",
+        "results/diff_norm4.txt",
+        "results/diff_norm5.txt",
+        "results/diff_norm6.txt",
+        "results/runs.json"
+    output:
+        "results/error_analysis_plot.png"
+    log:
+        "logs/dyadic_plot.log"
+    conda:
+        "envs/matplotlib.yaml"
+    shell:
+        "python scripts/errorplot_{workflow_mode}.py {input} {output}"
+
