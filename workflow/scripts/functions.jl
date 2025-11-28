@@ -84,10 +84,6 @@ function write_norms_to_file()
     open(joinpath(output_dir, "diff_norm6.txt"), "a") do f6
         println(f6, diff_norm6)
     end
-
-    open(joinpath(output_dir, "diff_total.txt"), "a") do f7
-        println(f7, diff_norm_beta)
-    end
 end
 
 # Helper function to format and write matrices to a file
@@ -100,49 +96,3 @@ function write_matrix(file, name, matrix)
         println(file)
     end
 end
-
-function generate_output_file()
-    # Replace "." with "_" in ARGS
-    args = ARGS
-    arg1, arg2, arg3, arg4 = (replace(arg, "." => "_") for arg in args)
-
-    # Generate a unique file name
-    output_file = joinpath(output_dir, "resultsX$(arg1)X$(arg2)X$(arg3)X$(arg4).txt")
-
-    # Open the file to write the output
-    open(output_file, "w") do file
-        # Write input parameters
-        #println(file, "Input parameters:")
-        #println(file, @sprintf("  S = %.3f", S))
-        #println(file, @sprintf("  T = %.3f", T))
-        #println(file, @sprintf("  h = %.6f", h))
-        #println(file, @sprintf("  nth order = %.1f", n_order))
-        #println(file, @sprintf("  number of stencils = %.1f", n_stencil))
-        #println(file, "  Output File = $output_file")
-        #println(file)
-
-        # Write matrices
-        println(file, "\nLucas' Dyadics:")
-        write_matrix(file, "SS_beta:", SS_beta)
-        write_matrix(file, "SS_beta2:", SS_beta2)
-        write_matrix(file, "SS_beta3:", SS_beta3)
-
-        println(file, "\nFull Term Derivative Dyadics:")
-        write_matrix(file, "Full Term Dyadic 1:", full_beta_derivatives[1])
-        write_matrix(file, "Full Term Dyadic 2:", full_beta_derivatives[2])
-        write_matrix(file, "Full Term Dyadic 3:", full_beta_derivatives[3])
-        write_matrix(file, "Full Term Dyadic 4:", full_beta_derivatives[4])
-        write_matrix(file, "Full Term Dyadic 5:", full_beta_derivatives[5])
-        write_matrix(file, "Full Term Dyadic 6:", full_beta_derivatives[6])
-
-        println(file, "\nDyadics Comparison:")
-        write_matrix(file, "Exact Dyadics:", exact_dyadics)
-        write_matrix(file, "SS_Lucas:", SS_Lucas)
-        write_matrix(file, "Numerical Dyadics with Full Terms:", full_beta_derivative_total)
-        write_matrix(file, "Residual term (exact - SS_Lucas):", residual)
-        write_matrix(file, "Numerical Residual(4th + 5th + 6th):", full_beta_residual)
-
-        println("Results have been saved!")
-    end
-end
-

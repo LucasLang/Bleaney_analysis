@@ -32,6 +32,7 @@ rule create_finitediff_functions:
         outfile = config['finitediff_file']
     shell:
         "julia scripts/create_finitediff_functions.jl {params.stencil_size} {params.outfile}"
+
 if workflow_mode == "TM":
     rule TM_workflow:
         output:

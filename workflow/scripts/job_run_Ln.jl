@@ -48,9 +48,7 @@ function read_range(filename)
 end
 
 # Define range
-arg1_range = 100:50:500
-#arg1_range = read_range(joinpath(input_dir, "T.txt")) 
-#arg3_range = [200.0]
+arg1_range = 100:50:500    # this is the range of temperatures
 
 # Extract the optimal h value and assign it to arg3_range
 h_value = extract_h_value_from_file(joinpath(output_dir, "optimal_h_values.txt"))
