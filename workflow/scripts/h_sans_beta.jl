@@ -63,7 +63,7 @@ hrange =  10.0 .^ (-5:1:4)
 for h in hrange
     gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
 
-    derivatives = generate_dyadic_terms2(gk_values)
+    derivatives = generate_numderiv_dyadic(gk_values)
 
     Sans_total = Sans_beta + Sans_beta2 + Sans_beta3
 

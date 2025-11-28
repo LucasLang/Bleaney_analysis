@@ -89,42 +89,25 @@ end
 #println("β sucessfully defined!")
 
 # exact Dyadics
-exact_dyadics = calc_dyadic(sh, T)
+exact_dyadic = calc_dyadic(sh, T)
 
-# JJ_beta = analytical derivatives
-first_deriv = ParaMag.JJbeta(shparam)
-second_deriv = ParaMag.JJbeta2(shparam)
-third_deriv = ParaMag.JJbeta3(shparam)
+num_derivatives = generate_numderiv_dyadic(gk_values)
+# for the first three, we use analytical derivatives, for the next three numerical
+derivatives = [ParaMag.JJbeta(shparam), ParaMag.JJbeta2(shparam), ParaMag.JJbeta3(shparam),
+               num_derivatives[4], num_derivatives[5], num_derivatives[6]]
 
-SS_beta = first_deriv * β
-SS_beta2 = 1/2 * second_deriv * β^2
-SS_beta3 = 1/6 * third_deriv * β^3
-
-SS_Curie = SS_beta
-SS_Bleaney = SS_Curie + SS_beta2
-SS_Lucas = SS_Bleaney + SS_beta3
-
-# Numerical derivatives calculator section
-full_beta_derivatives = generate_dyadic_terms(β, gk_values)
+Taylor_terms = [derivatives[k] * β^k / factorial(k) for k in 1:6]
 
 # Plot points generation
 # beta plots (analytical-numerical)
+diff_betas = [exact_dyadic - Taylor_terms[1]]   # difference when we approximate the dyadic with just the linear (Curie) term
+for order in 2:6
+    push!(diff_betas, diff_betas[order-1] - Taylor_terms[order])
+end
 
-diff_beta1 = exact_dyadics - SS_Curie
-diff_beta2 = exact_dyadics - SS_Bleaney
-diff_beta3 = exact_dyadics - SS_Lucas
-diff_beta4 = diff_beta3 - full_beta_derivatives[4]
-diff_beta5 = diff_beta4 - full_beta_derivatives[5]
-diff_beta6 = diff_beta5 - full_beta_derivatives[6]
-
-exact_norm = norm(exact_dyadics, 2)
+exact_norm = norm(exact_dyadic, 2)
 
 # norms
-diff_norm1 = norm(diff_beta1, 2)/exact_norm
-diff_norm2 = norm(diff_beta2, 2)/exact_norm
-diff_norm3 = norm(diff_beta3, 2)/exact_norm
-diff_norm4 = norm(diff_beta4, 2)/exact_norm
-diff_norm5 = norm(diff_beta5, 2)/exact_norm
-diff_norm6 = norm(diff_beta6, 2)/exact_norm
+diff_norms = [norm(diff_beta, 2)/exact_norm for diff_beta in diff_betas]
 
 write_norms_to_file()
