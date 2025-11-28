@@ -1,0 +1,2 @@
+stencil_size: 12
+finitediff_file: "results/finitediff_functions.jl"

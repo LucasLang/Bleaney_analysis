@@ -4,6 +4,7 @@ using Printf
 using DelimitedFiles
 #using DataStructures
 include("functions.jl")
+include("../results/finitediff_functions.jl")    #XXXLucasXXX: need to remove this hard-coded
 
 # Input settings
 # Get the directory of the script and construct the file path
@@ -59,8 +60,6 @@ sh = ParaMag.SpinHamiltonian(shparam)
 Sans_beta = ParaMag.JJbeta(shparam)
 Sans_beta2 = ParaMag.JJbeta2(shparam)
 Sans_beta3 = ParaMag.JJbeta3(shparam)
-
-function_names = generate_all_finite_differences(n_stencil)
 
 gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
 

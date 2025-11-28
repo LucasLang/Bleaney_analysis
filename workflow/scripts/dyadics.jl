@@ -3,9 +3,9 @@ using LinearAlgebra
 using Printf
 using DelimitedFiles
 using Serialization
-#include("function_SS_Lucas.jl")
-#include("gen4.jl")
-#include("output_settings.jl")
+
+include("../results/finitediff_functions.jl")    #XXXLucasXXX: need to remove this hard-coded
+
 include("functions.jl")
 
 # Input settings
@@ -63,8 +63,6 @@ marker_file = joinpath(output_dir, "derivatives_done.marker")
 
 if !isfile(marker_file)
     println("Running numerical derivatives calculator...")
-
-    function_names = generate_all_finite_differences(n_stencil)
 
     gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
     

@@ -1,3 +1,5 @@
+configfile: "../config/config.yaml"
+
 import os
 from glob import glob
 
@@ -19,8 +21,17 @@ bkq_check = bool(glob("data/Bkq_*_real"))
 
 rule all:
     input: 
+        config['finitediff_file'],   # XXXLucasXXX: later, this should become input to other rules that depend on it
         expand("results/error_analysis_plot.png", ln=wildcards_detected.ln)  # the wildcards are not expanded into the string: only one input required?
 
+rule create_finitediff_functions:
+    output:
+        config['finitediff_file']
+    params:
+        stencil_size = config['stencil_size'],
+        outfile = config['finitediff_file']
+    shell:
+        "julia scripts/create_finitediff_functions.jl {params.stencil_size} {params.outfile}"
 if workflow_mode == "TM":
     rule TM_workflow:
         output:
