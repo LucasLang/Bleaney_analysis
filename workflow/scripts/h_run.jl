@@ -33,15 +33,3 @@ run(command)
 open(joinpath(output_dir, "hruns.json"), "w") do file
     write(file, JSON.json(hruns))
 end
-
-# Check for txt plot points files
-required_files = [
-    joinpath(output_dir, "h_norm1.txt"),
-    joinpath(output_dir, "h_norm2.txt"),
-    joinpath(output_dir, "h_norm3.txt")
-    # joinpath(output_dir, "h_norm4.txt"),
-    # joinpath(output_dir, "h_norm5.txt"),
-    # joinpath(output_dir, "h_norm6.txt")
-]
-
-

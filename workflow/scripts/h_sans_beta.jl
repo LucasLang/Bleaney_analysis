@@ -60,7 +60,9 @@ h_norms2 = []
 h_norms3 = []
 
 hrange =  10.0 .^ (-5:1:4)
-for h in hrange
+hnumber = length(hrange)
+h_norms = Array{Float64}(undef, hnumber, 3)
+for (i,h) in enumerate(hrange)
     gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
 
     derivatives = generate_numderiv_dyadic(gk_values)
@@ -76,12 +78,9 @@ for h in hrange
     h_norm1 = norm(h_diff1, 2)/Sans_norm
     h_norm2 = norm(h_diff2, 2)/Sans_norm
     h_norm3 = norm(h_diff3, 2)/Sans_norm
-    
-    push!(h_norms1, h_norm1)
-    push!(h_norms2, h_norm2)
-    push!(h_norms3, h_norm3)
+    h_norms[i,1] = h_norm1
+    h_norms[i,2] = h_norm2
+    h_norms[i,3] = h_norm3
 end
 
-writedlm("$(output_dir)/h_norm1.txt", h_norms1)
-writedlm("$(output_dir)/h_norm2.txt", h_norms2)
-writedlm("$(output_dir)/h_norm3.txt", h_norms3)
+writedlm("$(output_dir)/h_norms.txt", h_norms)

@@ -22,7 +22,8 @@ bkq_check = bool(glob("data/Bkq_*_real"))
 rule all:
     input: 
         config['finitediff_file'],   # XXXLucasXXX: later, this should become input to other rules that depend on it
-        expand("results/error_analysis_plot.png", ln=wildcards_detected.ln)  # the wildcards are not expanded into the string: only one input required?
+        expand("results/error_analysis_plot.png", ln=wildcards_detected.ln),  # the wildcards are not expanded into the string: only one input required?
+        "results/h_plot.png"
 
 rule create_finitediff_functions:
     output:
@@ -45,38 +46,42 @@ if workflow_mode == "TM":
             "julia scripts/new_DTensor_func.jl {arg1} {arg2} {arg3} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]}"
 
 if workflow_mode == "Ln" or not bkq_check: 
-    rule optimise_h:
+    rule calc_hnorms:
         input:
             lambda wildcards: next(
                 (f for f in glob("data/Bkq_*_real")), 
                 ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
             )
         output:
-            "results/h_norm1.txt",
-            "results/h_norm2.txt",
-            "results/h_norm3.txt",
+            "results/h_norms.txt",
             "results/hruns.json"
         log:
             "logs/optimise_h.log"
         shell:
-            "julia scripts/h_run.jl {input} {output[0]} {output[1]} {output[2]} {output[3]}"
+            "julia scripts/h_run.jl"
 
 rule h_plot:
     input:
-        "results/h_norm1.txt",
-        "results/h_norm2.txt",
-        "results/h_norm3.txt",
+        "results/h_norms.txt",
         "results/hruns.json"
     output:
         "results/h_plot.png",
-        "results/optimal_h_values.txt",
         "results/plot_data.txt"
     log:
         "logs/h_plot.log"
     conda:
         "envs/matplotlib.yaml"
     shell:
-        "python scripts/h2_plots.py {input} {output[0]} {output[1]} {output[2]}"
+        "python scripts/h2_plots.py"
+
+rule optimize_h:
+    input:
+        "results/h_norms.txt",
+        "results/hruns.json"
+    output:
+        "results/optimal_h_values.txt",
+    shell:
+        "python scripts/optimal_hvalues.py"
 
 rule calc_run:
     input:
