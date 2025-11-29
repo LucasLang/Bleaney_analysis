@@ -88,13 +88,7 @@ rule calc_run:
     output:
         "results/derivatives_results.jld2",
         "results/derivatives_done.marker",
-        "results/diff_norm1.txt",
-        "results/diff_norm2.txt",
-        "results/diff_norm3.txt",
-        "results/diff_norm4.txt",
-        "results/diff_norm5.txt",
-        "results/diff_norm6.txt",
-        "results/runs.json"
+        "results/diff_norms.txt",
     log:
         "logs/calc_run.log"
     shell:
@@ -102,13 +96,7 @@ rule calc_run:
 
 rule dyadic_plot:
     input:
-        "results/diff_norm1.txt",
-        "results/diff_norm2.txt",
-        "results/diff_norm3.txt",
-        "results/diff_norm4.txt",
-        "results/diff_norm5.txt",
-        "results/diff_norm6.txt",
-        "results/runs.json"
+        "results/diff_norms.txt",
     output:
         "results/error_analysis_plot.png"
     log:

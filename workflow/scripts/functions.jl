@@ -40,15 +40,6 @@ end
 script_dir = @__DIR__
 output_dir = joinpath(script_dir, "..", "results")
 
-# Printing plot points into files
-function write_norms_to_file()
-    for order in 1:6
-        open(joinpath(output_dir, "diff_norm$order.txt"), "a") do f
-            println(f, diff_norms[order])
-        end
-    end
-end
-
 # Helper function to format and write matrices to a file
 function write_matrix(file, name, matrix)
     println(file, "\n$name:")

@@ -15,16 +15,11 @@ ln = match.group(1) if match else "Unknown"
 
 # --- results dir and temps from runs.json ---
 results_dir = "results"
-runs_file = os.path.join(results_dir, "runs.json")
-with open(runs_file, "r") as file:
-    runs = json.load(file)
 
-temps = [T[0] for T in runs]  # list of temperatures (K)
+temps = np.arange(100, 501, 50)
 
 # --- load data (6 columns: beta^1..beta^6) ---
-file_paths = [os.path.join(results_dir, f"diff_norm{i}.txt") for i in range(1, 7)]
-data_matrix = [np.loadtxt(path) for path in file_paths]
-data_matrix = np.array(data_matrix).T  # shape (n_curves, 6)
+data_matrix = np.loadtxt(os.path.join(results_dir, f"diff_norms.txt"))
 
 # --- axis labels for x ---
 beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$', r'$\beta^6$']
