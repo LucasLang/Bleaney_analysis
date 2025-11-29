@@ -86,13 +86,11 @@ rule calc_run:
         ),
         "results/optimal_h_values.txt"
     output:
-        "results/derivatives_results.jld2",
-        "results/derivatives_done.marker",
-        "results/diff_norms.txt",
+        "results/diff_norms.txt"
     log:
         "logs/calc_run.log"
     shell:
-        "julia scripts/job_run_{workflow_mode}.jl {input} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]} {output[5]} {output[6]} {output[7]} {output[8]}"
+        "julia scripts/job_run_{workflow_mode}.jl"
 
 rule dyadic_plot:
     input:

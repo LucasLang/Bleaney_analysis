@@ -57,32 +57,7 @@ end
 
 sh = ParaMag.SpinHamiltonian(shparam)
 
-# Define the cache file
-cache_file = joinpath(output_dir, "derivatives_results.jld2")
-marker_file = joinpath(output_dir, "derivatives_done.marker")
-
-if !isfile(marker_file)
-    println("Running numerical derivatives calculator...")
-
-    gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
-    
-    # Save precomputed results to a file
-    println("Saving precomputed results to file...")
-    #@save cache_file gk_values
-    open(cache_file, "w") do io
-        serialize(io, gk_values)
-    end
-
-    # Create the marker file
-    write(marker_file, "done")
-    println("Derivatives calculations complete.")
-else
-    println("Loading cached results...")
-    #@load cache_file gk_values
-    gk_values = open(cache_file, "r") do io
-        deserialize(io)
-    end
-end
+gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
 
 all_diff_norms = []
 for T in Tmin:Tinterval:Tmax
