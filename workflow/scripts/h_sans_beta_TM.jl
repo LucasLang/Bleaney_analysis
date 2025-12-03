@@ -52,39 +52,4 @@ else
     error("Both the primary and fallback files are missing. Cannot proceed.")
 end
 
-sh = ParaMag.SpinHamiltonian(shparam)
-
-Sans_beta = ParaMag.JJbeta(shparam)
-Sans_beta2 = ParaMag.JJbeta2(shparam)
-Sans_beta3 = ParaMag.JJbeta3(shparam)
-
-h_norms1 = []
-h_norms2 = []
-h_norms3 = []
-
-exprange = h_minexp:1:h_maxexp
-hrange = 10.0 .^ exprange
-hnumber = length(hrange)
-h_norms = Array{Float64}(undef, hnumber, 3)
-for (i,h) in enumerate(hrange)
-    gk_values = generate_gk_values(sh, function_names, h)
-
-    derivatives = generate_numderiv_dyadic(gk_values)
-
-    Sans_total = Sans_beta + Sans_beta2 + Sans_beta3
-
-    Sans_norm = norm(Sans_total, 2)
-
-    h_diff1 = Sans_beta - derivatives[1]
-    h_diff2 = Sans_beta2 - derivatives[2]
-    h_diff3 = Sans_beta3 - derivatives[3]
-
-    h_norm1 = norm(h_diff1, 2)/Sans_norm
-    h_norm2 = norm(h_diff2, 2)/Sans_norm
-    h_norm3 = norm(h_diff3, 2)/Sans_norm
-    h_norms[i,1] = h_norm1
-    h_norms[i,2] = h_norm2
-    h_norms[i,3] = h_norm3
-end
-
-writedlm("$(output_dir)/h_norms.txt", h_norms)
+run_hnorms(shparam, h_minexp, h_maxexp)

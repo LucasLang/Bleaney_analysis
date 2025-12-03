@@ -1,28 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import re
-import glob
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 import sys
 
-# --- detect lanthanoid name from file like data/Bkq_<LN>_real ---
-lnfile = glob.glob("data/Bkq_*_real")[0]
-lnname = os.path.basename(lnfile)
-match = re.search(r"Bkq_(\w+)_real", lnname)
-ln = match.group(1) if match else "Unknown"
-
-# --- results dir and temps from runs.json ---
-results_dir = "results"
-
 Tmin = int(sys.argv[1])
 Tmax = int(sys.argv[2])
 Tinterval = int(sys.argv[3])
+diff_norms_file = sys.argv[4]
+ln = sys.argv[5]
+error_analysis_plot_file = sys.argv[6]
 temps = np.arange(Tmin, Tmax+1, Tinterval)
 
 # --- load data (6 columns: beta^1..beta^6) ---
-data_matrix = np.loadtxt(os.path.join(results_dir, f"diff_norms.txt"))
+data_matrix = np.loadtxt(diff_norms_file)
 
 # --- axis labels for x ---
 beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$', r'$\beta^6$']
@@ -81,6 +72,5 @@ ax.text(
 plt.tight_layout()
 
 # --- save ---
-error_analysis_plot_file = os.path.join(results_dir, "error_analysis_plot.png")
 plt.savefig(error_analysis_plot_file, dpi=300, bbox_inches='tight')
 

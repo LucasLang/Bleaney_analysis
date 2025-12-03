@@ -8,21 +8,12 @@ arg1 = config.get("arg1", None)
 arg2 = config.get("arg2", None)
 arg3 = config.get("arg3", None)
 
-# Conditionally set workflow mode based on arguments
-if arg1 is not None and arg2 is not None and arg3 is not None:
-    workflow_mode = "TM"
-else:
-    workflow_mode = "Ln"
-
-wildcards_detected = glob_wildcards("data/Bkq_{ln}_real")   # this will give a list of strings containing the lanthanides
-
-# Check if any Bkq_*_real files exist
-bkq_check = bool(glob("data/Bkq_*_real"))
+Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list of strings containing the lanthanides
 
 rule all:
     input: 
-        expand("results/error_analysis_plot.png", ln=wildcards_detected.ln),  # the wildcards are not expanded into the string: only one input required?
-        "results/h_plot.png"
+        expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
+        expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards)
 
 rule create_finitediff_functions:
     output:
@@ -33,88 +24,105 @@ rule create_finitediff_functions:
     shell:
         "julia scripts/create_finitediff_functions.jl {params.stencil_size} {params.outfile}"
 
-if workflow_mode == "TM":
-    rule TM_workflow:
-        output:
-            "data/spin_dyadics_input.txt",
-            "data/S.txt",
-            "data/D.txt",
-            "data/T.txt",
-            "data/ratio.txt"
-        shell:
-            "julia scripts/new_DTensor_func.jl {arg1} {arg2} {arg3} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]}"
+rule TM_workflow:
+    output:
+        "data/spin_dyadics_input.txt",
+        "data/S.txt",
+        "data/D.txt",
+        "data/T.txt",
+        "data/ratio.txt"
+    shell:
+        "julia scripts/new_DTensor_func.jl {arg1} {arg2} {arg3} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]}"
 
-if workflow_mode == "Ln" or not bkq_check: 
-    rule calc_hnorms:
-        input:
-            lambda wildcards: next(
-                (f for f in glob("data/Bkq_*_real")), 
-                ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
-            ),
-            last=config['finitediff_file']
-        output:
-            "results/h_norms.txt"
-        log:
-            "logs/optimise_h.log"
-        params:
-            h_minexp = config['h_minexp'],
-            h_maxexp = config['h_maxexp']
-        shell:
-            "julia scripts/h_sans_beta.jl {params.h_minexp} {params.h_maxexp} {input.last}"
+rule calc_hnorms_Ln:
+    input:
+        "data/Bkq_{Ln}_real",
+        last=config['finitediff_file']
+    output:
+        "results/Ln/{Ln}/h_norms.txt"
+    params:
+        h_minexp = config['h_minexp'],
+        h_maxexp = config['h_maxexp']
+    shell:
+        "julia scripts/h_sans_beta_Ln.jl {params.h_minexp} {params.h_maxexp} {input.last} {wildcards.Ln} {output}"
+
+rule calc_hnorms_TM:
+    input:
+        "data/spin_dyadics_input.txt",
+        "data/S.txt",
+        "data/D.txt",
+        "data/ratio.txt",
+        "data/T.txt",
+        last=config['finitediff_file']
+    output:
+        "results/h_norms.txt"
+    params:
+        h_minexp = config['h_minexp'],
+        h_maxexp = config['h_maxexp']
+    shell:
+        "julia scripts/h_sans_beta_TM.jl {params.h_minexp} {params.h_maxexp} {input.last}"
 
 rule h_plot:
     input:
-        "results/h_norms.txt"
+        "results/{folder}/h_norms.txt"
     output:
-        "results/h_plot.png",
-        "results/plot_data.txt"
-    log:
-        "logs/h_plot.log"
+        "results/{folder}/h_plot.png"
     conda:
         "envs/matplotlib.yaml"
     params:
         h_minexp = config['h_minexp'],
         h_maxexp = config['h_maxexp']
     shell:
-        "python scripts/h2_plots.py {params.h_minexp} {params.h_maxexp}"
+        "python scripts/h2_plots.py {params.h_minexp} {params.h_maxexp} {input} {output}"
 
 rule optimize_h:
     input:
-        "results/h_norms.txt"
+        "results/Ln/{Ln}/h_norms.txt"
     output:
-        "results/optimal_h_value.txt",
+        "results/Ln/{Ln}/optimal_h_value.txt",
     params:
         h_minexp = config['h_minexp'],
         h_maxexp = config['h_maxexp']
     shell:
-        "python scripts/optimal_hvalues.py {params.h_minexp} {params.h_maxexp}"
+        "python scripts/optimal_hvalues.py {params.h_minexp} {params.h_maxexp} {input} {output}"
 
-rule calc_run:
+rule calc_run_Ln:
     input:
-        lambda wildcards: next(
-            (f for f in glob("data/Bkq_*_real")), 
-            ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
-        ),
+        "data/Bkq_{Ln}_real",
+        h = "results/Ln/{Ln}/optimal_h_value.txt",
+        last=config['finitediff_file']
+    output:
+        "results/Ln/{Ln}/diff_norms.txt"
+    params:
+        Tmin = config['Ln_Tmin'],
+        Tmax = config['Ln_Tmax'],
+        Tinterval = config['Ln_Tinterval']
+    shell:
+        "julia scripts/dyadics_Ln.jl {params.Tmin} {params.Tmax} {params.Tinterval} {input.h} {input.last} {wildcards.Ln} {output}"
+
+rule calc_run_TM:
+    input:
+        "data/spin_dyadics_input.txt",
+        "data/S.txt",
+        "data/D.txt",
+        "data/ratio.txt",
+        "data/T.txt",
         "results/optimal_h_value.txt",
         last=config['finitediff_file']
     output:
         "results/diff_norms.txt"
-    log:
-        "logs/calc_run.log"
     params:
         Tmin = config['Ln_Tmin'],
         Tmax = config['Ln_Tmax'],
         Tinterval = config['Ln_Tinterval']
     shell:
-        "julia scripts/dyadics.jl {params.Tmin} {params.Tmax} {params.Tinterval} results/optimal_h_value.txt {input.last}"  #XXXLucasXXX: need to generalize this to the TM case later
+        "julia scripts/dyadics_TM.jl {params.Tmin} {params.Tmax} {params.Tinterval} results/optimal_h_value.txt {input.last}"
 
 rule dyadic_plot:
     input:
-        "results/diff_norms.txt",
+        "results/{folder}/{system}/diff_norms.txt",
     output:
-        "results/error_analysis_plot.png"
-    log:
-        "logs/dyadic_plot.log"
+        "results/{folder}/{system}/error_analysis_plot.png"
     conda:
         "envs/matplotlib.yaml"
     params:
@@ -122,5 +130,5 @@ rule dyadic_plot:
         Tmax = config['Ln_Tmax'],
         Tinterval = config['Ln_Tinterval']
     shell:
-        "python scripts/errorplot_{workflow_mode}.py {params.Tmin} {params.Tmax} {params.Tinterval}"
+        "python scripts/errorplot_{wildcards.folder}.py {params.Tmin} {params.Tmax} {params.Tinterval} {input} {wildcards.system} {output}"
 
