@@ -4,8 +4,6 @@ using Printf
 using DelimitedFiles
 using Serialization
 
-include("../results/finitediff_functions.jl")    #XXXLucasXXX: need to remove this hard-coded
-
 include("functions.jl")
 
 # Input settings
@@ -37,6 +35,8 @@ Tmin = parse(Float64, ARGS[1])
 Tmax = parse(Float64, ARGS[2]) 
 Tinterval = parse(Float64, ARGS[3]) 
 h = readdlm(ARGS[4])[1]
+finitediff_functions_file = ARGS[5]
+include("../"*finitediff_functions_file)  # file is provided as relative path; have to move up one directory from "scripts"
 gtensor = 2*Matrix(1.0I, 3, 3)
 
 # Defining shparam

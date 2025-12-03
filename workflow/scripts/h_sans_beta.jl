@@ -2,12 +2,12 @@ using ParaMag
 using LinearAlgebra
 using Printf
 using DelimitedFiles
-#using DataStructures
 include("functions.jl")
-include("../results/finitediff_functions.jl")    #XXXLucasXXX: need to remove this hard-coded
 
 h_minexp = parse(Int64, ARGS[1])
 h_maxexp = parse(Int64, ARGS[2])
+finitediff_functions_file = ARGS[3]
+include("../"*finitediff_functions_file)  # file is provided as relative path; have to move up one directory from "scripts"
 
 # Input settings
 # Get the directory of the script and construct the file path

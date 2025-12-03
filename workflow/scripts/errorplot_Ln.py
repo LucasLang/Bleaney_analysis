@@ -16,9 +16,9 @@ ln = match.group(1) if match else "Unknown"
 # --- results dir and temps from runs.json ---
 results_dir = "results"
 
-Tmin = sys.argv[1]
-Tmax = sys.argv[2]
-Tinterval = sys.argv[3]
+Tmin = int(sys.argv[1])
+Tmax = int(sys.argv[2])
+Tinterval = int(sys.argv[3])
 temps = np.arange(Tmin, Tmax+1, Tinterval)
 
 # --- load data (6 columns: beta^1..beta^6) ---

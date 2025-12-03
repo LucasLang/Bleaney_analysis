@@ -21,7 +21,6 @@ bkq_check = bool(glob("data/Bkq_*_real"))
 
 rule all:
     input: 
-        config['finitediff_file'],   # XXXLucasXXX: later, this should become input to other rules that depend on it
         expand("results/error_analysis_plot.png", ln=wildcards_detected.ln),  # the wildcards are not expanded into the string: only one input required?
         "results/h_plot.png"
 
@@ -51,7 +50,8 @@ if workflow_mode == "Ln" or not bkq_check:
             lambda wildcards: next(
                 (f for f in glob("data/Bkq_*_real")), 
                 ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
-            )
+            ),
+            last=config['finitediff_file']
         output:
             "results/h_norms.txt"
         log:
@@ -60,7 +60,7 @@ if workflow_mode == "Ln" or not bkq_check:
             h_minexp = config['h_minexp'],
             h_maxexp = config['h_maxexp']
         shell:
-            "julia scripts/h_sans_beta.jl {params.h_minexp} {params.h_maxexp}"
+            "julia scripts/h_sans_beta.jl {params.h_minexp} {params.h_maxexp} {input.last}"
 
 rule h_plot:
     input:
@@ -95,7 +95,8 @@ rule calc_run:
             (f for f in glob("data/Bkq_*_real")), 
             ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
         ),
-        "results/optimal_h_value.txt"
+        "results/optimal_h_value.txt",
+        last=config['finitediff_file']
     output:
         "results/diff_norms.txt"
     log:
@@ -105,7 +106,7 @@ rule calc_run:
         Tmax = config['Ln_Tmax'],
         Tinterval = config['Ln_Tinterval']
     shell:
-        "julia scripts/dyadics.jl {params.Tmin} {params.Tmax} {params.Tinterval} results/optimal_h_value.txt"  #XXXLucasXXX: need to generalize this to the TM case later
+        "julia scripts/dyadics.jl {params.Tmin} {params.Tmax} {params.Tinterval} results/optimal_h_value.txt {input.last}"  #XXXLucasXXX: need to generalize this to the TM case later
 
 rule dyadic_plot:
     input:
