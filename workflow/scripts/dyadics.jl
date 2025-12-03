@@ -36,7 +36,7 @@ fallback_file = joinpath(data_dir, "Bkq_$(Ln)_real")
 Tmin = parse(Float64, ARGS[1]) 
 Tmax = parse(Float64, ARGS[2]) 
 Tinterval = parse(Float64, ARGS[3]) 
-h = parse(Float64, ARGS[4])  
+h = readdlm(ARGS[4])[1]
 gtensor = 2*Matrix(1.0I, 3, 3)
 
 # Defining shparam

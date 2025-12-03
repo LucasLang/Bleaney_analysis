@@ -82,7 +82,7 @@ rule optimize_h:
     input:
         "results/h_norms.txt"
     output:
-        "results/optimal_h_values.txt",
+        "results/optimal_h_value.txt",
     params:
         h_minexp = config['h_minexp'],
         h_maxexp = config['h_maxexp']
@@ -95,13 +95,17 @@ rule calc_run:
             (f for f in glob("data/Bkq_*_real")), 
             ("data/spin_dyadics_input.txt", "data/S.txt", "data/D.txt", "data/ratio.txt", "data/T.txt")
         ),
-        "results/optimal_h_values.txt"
+        "results/optimal_h_value.txt"
     output:
         "results/diff_norms.txt"
     log:
         "logs/calc_run.log"
+    params:
+        Tmin = config['Ln_Tmin'],
+        Tmax = config['Ln_Tmax'],
+        Tinterval = config['Ln_Tinterval']
     shell:
-        "julia scripts/job_run_{workflow_mode}.jl"
+        "julia scripts/dyadics.jl {params.Tmin} {params.Tmax} {params.Tinterval} results/optimal_h_value.txt"  #XXXLucasXXX: need to generalize this to the TM case later
 
 rule dyadic_plot:
     input:

@@ -24,13 +24,7 @@ optimal_h_values = h2_vals[min_indices.astype(int)]
 # Compute the average of the optimal h values
 optimal_h_avg = np.mean(optimal_h_values)
 
-# Save results to a text file
-output_file = os.path.join(results_dir, "optimal_h_values.txt")
-with open(output_file, "w") as f:
-    f.write("Optimal h values for individual beta terms:\n")
-    for i, h in enumerate(optimal_h_values):
-        f.write(f"Beta term {i+1}: {h:.15e}\n")
-    f.write(f"\nOptimal h value (average of all beta terms): {optimal_h_avg:.15e}\n")
-
+output_file = os.path.join(results_dir, "optimal_h_value.txt")
+np.savetxt(output_file, [optimal_h_avg])
 print(f"Results saved to {output_file}")
 
