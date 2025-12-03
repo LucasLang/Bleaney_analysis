@@ -6,6 +6,9 @@ using DelimitedFiles
 include("functions.jl")
 include("../results/finitediff_functions.jl")    #XXXLucasXXX: need to remove this hard-coded
 
+h_minexp = parse(Int64, ARGS[1])
+h_maxexp = parse(Int64, ARGS[2])
+
 # Input settings
 # Get the directory of the script and construct the file path
 script_dir = @__DIR__
@@ -59,7 +62,8 @@ h_norms1 = []
 h_norms2 = []
 h_norms3 = []
 
-hrange =  10.0 .^ (-5:1:4)
+exprange = h_minexp:1:h_maxexp
+hrange = 10.0 .^ exprange
 hnumber = length(hrange)
 h_norms = Array{Float64}(undef, hnumber, 3)
 for (i,h) in enumerate(hrange)

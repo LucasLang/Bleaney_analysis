@@ -1,17 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import json
 import os
+import sys
+
+h_minexp = int(sys.argv[1])
+h_maxexp = int(sys.argv[2])
 
 # Define the results directory
 results_dir = "results"
 
-# Read h values from hruns.json (in the results directory)
-hruns_file = os.path.join(results_dir, "hruns.json")
-with open(hruns_file, "r") as file:
-    hruns = json.load(file)
-
-h_vals = [h[1] for h in hruns]  # Extract h values 
+h_vals = [10**h for h in range(h_minexp, h_maxexp + 1)]
 
 data_matrix = np.loadtxt(os.path.join(results_dir, "h_norms.txt"))   # Shape: hvals x 3
 
