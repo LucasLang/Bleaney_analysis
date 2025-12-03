@@ -116,6 +116,10 @@ rule dyadic_plot:
         "logs/dyadic_plot.log"
     conda:
         "envs/matplotlib.yaml"
+    params:
+        Tmin = config['Ln_Tmin'],
+        Tmax = config['Ln_Tmax'],
+        Tinterval = config['Ln_Tinterval']
     shell:
-        "python scripts/errorplot_{workflow_mode}.py {input} {output}"
+        "python scripts/errorplot_{workflow_mode}.py {params.Tmin} {params.Tmax} {params.Tinterval}"
 

@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import json
 import os
 import re
 import glob
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+import sys
 
 # --- detect lanthanoid name from file like data/Bkq_<LN>_real ---
 lnfile = glob.glob("data/Bkq_*_real")[0]
@@ -16,7 +16,10 @@ ln = match.group(1) if match else "Unknown"
 # --- results dir and temps from runs.json ---
 results_dir = "results"
 
-temps = np.arange(100, 501, 50)
+Tmin = sys.argv[1]
+Tmax = sys.argv[2]
+Tinterval = sys.argv[3]
+temps = np.arange(Tmin, Tmax+1, Tinterval)
 
 # --- load data (6 columns: beta^1..beta^6) ---
 data_matrix = np.loadtxt(os.path.join(results_dir, f"diff_norms.txt"))
