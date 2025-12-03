@@ -67,7 +67,7 @@ hrange = 10.0 .^ exprange
 hnumber = length(hrange)
 h_norms = Array{Float64}(undef, hnumber, 3)
 for (i,h) in enumerate(hrange)
-    gk_values = generate_gk_values(function_names, calc_dyadics_over_beta, h)
+    gk_values = generate_gk_values(sh, function_names, h)
 
     derivatives = generate_numderiv_dyadic(gk_values)
 
