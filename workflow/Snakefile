@@ -3,17 +3,14 @@ configfile: "../config/config.yaml"
 import os
 from glob import glob
 
-# Access arguments passed via --config in Snakemake
-arg1 = config.get("arg1", None)
-arg2 = config.get("arg2", None)
-arg3 = config.get("arg3", None)
-
 Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list of strings containing the lanthanides
 
 rule all:
     input: 
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
-        expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards)
+        expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
+        #"results/Tm/S_1.5/rhombicity_0.16666666666666666/D_-3/error_analysis_plot.png",
+        "results/TM/S_1/E_0/D_3/h_plot.png"
 
 rule create_finitediff_functions:
     output:
@@ -26,13 +23,10 @@ rule create_finitediff_functions:
 
 rule TM_workflow:
     output:
-        "data/spin_dyadics_input.txt",
-        "data/S.txt",
-        "data/D.txt",
-        "data/T.txt",
-        "data/ratio.txt"
+        "results/TM/S_{S}/E_{E}/D_{D}/Dtensor_au.txt",
+        "results/TM/S_{S}/E_{E}/D_{D}/T.txt"
     shell:
-        "julia scripts/new_DTensor_func.jl {arg1} {arg2} {arg3} {output[0]} {output[1]} {output[2]} {output[3]} {output[4]}"
+        "julia scripts/new_DTensor_func.jl {wildcards.D} {wildcards.E} {wildcards.S} {output[0]} {output[1]}"
 
 rule calc_hnorms_Ln:
     input:
@@ -48,19 +42,15 @@ rule calc_hnorms_Ln:
 
 rule calc_hnorms_TM:
     input:
-        "data/spin_dyadics_input.txt",
-        "data/S.txt",
-        "data/D.txt",
-        "data/ratio.txt",
-        "data/T.txt",
+        "results/TM/S_{S}/E_{E}/D_{D}/Dtensor_au.txt",
         last=config['finitediff_file']
     output:
-        "results/h_norms.txt"
+        "results/TM/S_{S}/E_{E}/D_{D}/h_norms.txt"
     params:
         h_minexp = config['h_minexp'],
         h_maxexp = config['h_maxexp']
     shell:
-        "julia scripts/h_sans_beta_TM.jl {params.h_minexp} {params.h_maxexp} {input.last}"
+        "julia scripts/h_sans_beta_TM.jl {params.h_minexp} {params.h_maxexp} {input.last} {input[0]} {wildcards.S} {output}"
 
 rule h_plot:
     input:
@@ -102,7 +92,7 @@ rule calc_run_Ln:
 
 rule calc_run_TM:
     input:
-        "data/spin_dyadics_input.txt",
+        "data/Dtensor_au.txt",
         "data/S.txt",
         "data/D.txt",
         "data/ratio.txt",

@@ -1,6 +1,6 @@
 using Printf
 using LinearAlgebra
-using JSON
+using DelimitedFiles
 
 function new_Dtensor(D, E)
     conversion_factor = 1 / 219474.63  # cm^-1 to a.u. conversion
@@ -23,7 +23,6 @@ conversion_factor_k = 219474.63
 kB = k * conversion_factor_k
 
 # temp_ratio = D/kB*T
-
 function generate_temperature(temp_ratio, D)
     conversion_factor = 1 / 219474.63
     result = (D * conversion_factor) / (k * temp_ratio)
@@ -42,53 +41,9 @@ script_dir = @__DIR__
 input_dir = joinpath(script_dir, "..", "data")
 output_dir = joinpath(script_dir, "..", "results")
 
-function write_matrix(file, matrix)
-    #println(file, "\n$name:")
-    for i in 1:size(matrix, 1)
-        for j in 1:size(matrix, 2)
-            @printf(file, " %12.6e ", matrix[i, j])
-        end
-        println(file)
-    end
-end
+# Generate a unique file name
+output_file = ARGS[4]
+output_file2 = ARGS[5]
 
-function generate_Dtensor_file()
-    # Replace "." with "_" in ARGS
-    args = ARGS
-    arg1, arg2 = (replace(arg, "." => "_") for arg in args)
-
-    # Generate a unique file name
-    output_file = joinpath(input_dir, "spin_dyadics_input.txt")
-    output_file2 = joinpath(input_dir, "S.txt")
-    output_file3 = joinpath(input_dir, "D.txt")
-    output_file4 = joinpath(input_dir, "T.txt")
-    output_file5 = joinpath(input_dir, "ratio.txt")
-
-    open(output_file, "w") do file
-        write_matrix(file, Dtensor)
-
-    end
-   
-    open(output_file2, "w") do file
-        println(file, S)
-
-    end
-
-    open(output_file3, "w") do file
-        println(file, D)
-
-    end
-    
-    open(output_file4, "w") do file
-        println(file, T)
-
-    end
-    
-    open(output_file5, "w") do file
-        println(file, ratio)
-
-    end
-
-end
-
-generate_Dtensor_file()
+writedlm(output_file, Dtensor)
+writedlm(output_file2, T)
