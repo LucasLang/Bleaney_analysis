@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib.cm as cm
 import numpy as np
-import json
-import os
+import sys
 from fractions import Fraction
 
 def sci_label(x, sig=2):
@@ -13,74 +14,47 @@ def sci_label(x, sig=2):
     # Keep the sign with the mantissa
     return rf"${mant:.{sig}f}\times 10^{{{exp}}}$"
 
-# Define the directories
-results_dir = "results"
-data_dir = "data"
-
-ratio_file = os.path.join(data_dir, "ratio.txt")
-with open(ratio_file, "r") as file:
-    ratio = file.read()
-
 k = 3.166811563e-6 
 conversion_factor = 219474.63
 kB = k * conversion_factor
 
-# Read temperatures from runs.json in the results folder
-runs_file = os.path.join(results_dir, "runs.json")
-with open(runs_file, "r") as file:
-    runs = json.load(file)
+S = float(sys.argv[1])
+E = int(sys.argv[2])
+D = int(sys.argv[3])
+diff_norms_file = sys.argv[4]
+Tpointsfile = sys.argv[5]
+error_analysis_plot_file = sys.argv[6]
 
-temps = [T[0] for T in runs]
 
-D = np.loadtxt("data/D.txt", dtype=np.float64)
-S = np.loadtxt("data/S.txt", dtype=np.float64)
+temps = np.loadtxt(Tpointsfile)
 
-# Define file paths in the 'results' folder
-file_paths = [
-    os.path.join(results_dir, "diff_norm1.txt"),
-    os.path.join(results_dir, "diff_norm2.txt"),
-    os.path.join(results_dir, "diff_norm3.txt"),
-    os.path.join(results_dir, "diff_norm4.txt"),
-    os.path.join(results_dir, "diff_norm5.txt"),
-    os.path.join(results_dir, "diff_norm6.txt")
-]
-
-# Load data 
-data_matrix = []
-for path in file_paths:
-    data = np.loadtxt(path) 
-    data_matrix.append(data)
-
-# Load data into matrices and transpose
-data_matrix = np.array(data_matrix).T
+data_matrix = np.loadtxt(diff_norms_file)
 
 # X-axis labels
 beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$', r'$\beta^6$']
-temperature_points = temps
 
 # Create figure and axes with larger size
-plt.figure(figsize=(13, 10))
+plt.figure(figsize=(10,6))
 
-# Create two subplots: main plot and legend
-#gs = plt.GridSpec(1, 2, width_ratios=[3, 1])
-ax = plt.gca() #plt.subplot(gs[0])
-#leg = plt.subplot(gs[1])
-#leg.axis('off')
+ax = plt.gca()
 
-# Color map for better distinction between lines
-colors = plt.cm.viridis(np.linspace(0, 1, len(data_matrix)))
+# --- colors by temperature (log-normalized) ---
+norm = mcolors.LogNorm(vmin=min(temps), vmax=max(temps))
+cmap = cm.viridis
+colors = [cmap(norm(t)) for t in temps]
 
 # Plotting with improved visibility
 for i, (temp_data, color) in enumerate(zip(data_matrix, colors)):
-    temperature_ratio = D / (kB * temperature_points[i])
+    temperature_ratio = D / (kB * temps[i])
     formatted_label = sci_label(float(temperature_ratio), sig=2)
     ax.plot(beta_terms, temp_data, marker='o', label=formatted_label, 
             color=color, linewidth=2, markersize=8)
 
 # Convert to fraction
-E_over_D_fraction = Fraction(float(ratio)).limit_denominator()
+E_over_D_fraction = Fraction(E,D)
 
-S_frac = Fraction(float(S)).limit_denominator()
+twotimesS = int(2*S)
+S_frac = Fraction(twotimesS, 2)  # Fraction objects nicely interpolate into strings
 
 # Main plot formatting
 ax.set_yscale('log')
@@ -121,5 +95,4 @@ ax.add_artist(first_legend)
 plt.tight_layout()
 
 # Save with higher resolution and larger size
-error_analysis_plot_file = os.path.join(results_dir, "error_analysis_plot.png")
 plt.savefig(error_analysis_plot_file, dpi=300, bbox_inches='tight')

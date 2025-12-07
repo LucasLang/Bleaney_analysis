@@ -51,13 +51,13 @@ function write_matrix(file, name, matrix)
     end
 end
 
-function run_dyadics(shparam)
+function run_dyadics(shparam, temperatures)
     sh = ParaMag.SpinHamiltonian(shparam)
 
     gk_values = generate_gk_values(sh, function_names, h)
 
     all_diff_norms = []
-    for T in Tmin:Tinterval:Tmax
+    for T in temperatures
         # define beta
         β = 1 / (ParaMag.kB * T)
 

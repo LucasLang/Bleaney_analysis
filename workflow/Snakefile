@@ -9,8 +9,14 @@ rule all:
     input: 
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
         expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
-        #"results/Tm/S_1.5/rhombicity_0.16666666666666666/D_-3/error_analysis_plot.png",
-        "results/TM/S_1/E_0/D_3/h_plot.png"
+        "results/TM/S_1/E_0/D_3/error_analysis_plot.png",
+        "results/TM/S_1/E_0/D_3/h_plot.png",
+        "results/TM/S_1/E_1/D_3/error_analysis_plot.png",
+        "results/TM/S_1/E_1/D_3/h_plot.png",
+        "results/TM/S_1/E_0/D_-3/error_analysis_plot.png",
+        "results/TM/S_1/E_0/D_-3/h_plot.png",
+        "results/TM/S_2.5/E_0/D_3/error_analysis_plot.png",
+        "results/TM/S_2.5/E_0/D_3/h_plot.png"
 
 rule create_finitediff_functions:
     output:
@@ -67,9 +73,9 @@ rule h_plot:
 
 rule optimize_h:
     input:
-        "results/Ln/{Ln}/h_norms.txt"
+        "results/{folder}/h_norms.txt"
     output:
-        "results/Ln/{Ln}/optimal_h_value.txt",
+        "results/{folder}/optimal_h_value.txt",
     params:
         h_minexp = config['h_minexp'],
         h_maxexp = config['h_maxexp']
@@ -92,27 +98,20 @@ rule calc_run_Ln:
 
 rule calc_run_TM:
     input:
-        "data/Dtensor_au.txt",
-        "data/S.txt",
-        "data/D.txt",
-        "data/ratio.txt",
-        "data/T.txt",
-        "results/optimal_h_value.txt",
+        "results/TM/S_{S}/E_{E}/D_{D}/Dtensor_au.txt",
+        "results/TM/S_{S}/E_{E}/D_{D}/T.txt",
+        "results/TM/S_{S}/E_{E}/D_{D}/optimal_h_value.txt",
         last=config['finitediff_file']
     output:
-        "results/diff_norms.txt"
-    params:
-        Tmin = config['Ln_Tmin'],
-        Tmax = config['Ln_Tmax'],
-        Tinterval = config['Ln_Tinterval']
+        "results/TM/S_{S}/E_{E}/D_{D}/diff_norms.txt"
     shell:
-        "julia scripts/dyadics_TM.jl {params.Tmin} {params.Tmax} {params.Tinterval} results/optimal_h_value.txt {input.last}"
+        "julia scripts/dyadics_TM.jl {input[0]} {wildcards.S} {input[1]} {input[2]} {input[3]} {output}"
 
-rule dyadic_plot:
+rule dyadic_plot_Ln:
     input:
-        "results/{folder}/{system}/diff_norms.txt",
+        "results/Ln/{system}/diff_norms.txt",
     output:
-        "results/{folder}/{system}/error_analysis_plot.png"
+        "results/Ln/{system}/error_analysis_plot.png"
     conda:
         "envs/matplotlib.yaml"
     params:
@@ -120,5 +119,15 @@ rule dyadic_plot:
         Tmax = config['Ln_Tmax'],
         Tinterval = config['Ln_Tinterval']
     shell:
-        "python scripts/errorplot_{wildcards.folder}.py {params.Tmin} {params.Tmax} {params.Tinterval} {input} {wildcards.system} {output}"
+        "python scripts/errorplot_Ln.py {params.Tmin} {params.Tmax} {params.Tinterval} {input} {wildcards.system} {output}"
 
+rule dyadic_plot_TM:
+    input:
+        "results/TM/S_{S}/E_{E}/D_{D}/diff_norms.txt",
+        "results/TM/S_{S}/E_{E}/D_{D}/T.txt"
+    output:
+        "results/TM/S_{S}/E_{E}/D_{D}/error_analysis_plot.png"
+    conda:
+        "envs/matplotlib.yaml"
+    shell:
+        "python scripts/errorplot_TM.py {wildcards.S} {wildcards.E} {wildcards.D} {input[0]} {input[1]} {output}"

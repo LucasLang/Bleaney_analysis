@@ -6,7 +6,6 @@ using Serialization
 
 include("functions.jl")
 
-
 # Variables and arguments
 Tmin = parse(Float64, ARGS[1]) 
 Tmax = parse(Float64, ARGS[2]) 
@@ -22,9 +21,9 @@ script_dir = @__DIR__
 data_dir = joinpath(script_dir, "..", "data")
 param_file = joinpath(data_dir, "Bkq_$(Ln)_real")
       
-
 # Defining shparam
 shparam = ParaMag.SHParam_lanthanoid(param_file, Ln)
 
-all_diff_norms_matrix = run_dyadics(shparam)
+temperatures = Tmin:Tinterval:Tmax
+all_diff_norms_matrix = run_dyadics(shparam, temperatures)
 writedlm(output_file, all_diff_norms_matrix)
