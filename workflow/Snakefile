@@ -8,6 +8,7 @@ Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list
 rule all:
     input: 
         "results/susctable/chi_ax.png",
+        "results/susctable/chi_rh.png",
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
         expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
         "results/TM/S_1/E_0/D_3/error_analysis_plot.png",
@@ -41,6 +42,17 @@ rule plot_chi_ax:
     shell:
         "python scripts/barplot_chiax.py {input} {output}"
 
+rule plot_chi_rh:
+    input:
+        "results/susctable/Ln_list",
+        "results/susctable/chi_rh",
+        "data/chi_rh_CASSCF"
+    output:
+        "results/susctable/chi_rh.png"
+    conda:
+        "envs/matplotlib.yaml"
+    shell:
+        "python scripts/barplot_chirh.py {input} {output}"
 
 rule create_finitediff_functions:
     output:
