@@ -7,7 +7,7 @@ Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list
 
 rule all:
     input: 
-        "results/susctable/susctable.tex",
+        "results/susctable/chi_ax.png",
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
         expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
         "results/TM/S_1/E_0/D_3/error_analysis_plot.png",
@@ -29,13 +29,18 @@ rule calc_susc_aniso:
     shell:
         "julia scripts/susc_aniso.jl data {output} {Ln_wildcards}"
 
-rule write_table_susc:
+rule plot_chi_ax:
     input:
         "results/susctable/Ln_list",
         "results/susctable/chi_ax",
-        "results/susctable/chi_rh"
+        "data/chi_ax_CASSCF"
     output:
-        "results/susctable/susctable.tex"
+        "results/susctable/chi_ax.png"
+    conda:
+        "envs/matplotlib.yaml"
+    shell:
+        "python scripts/barplot_chiax.py {input} {output}"
+
 
 rule create_finitediff_functions:
     output:
