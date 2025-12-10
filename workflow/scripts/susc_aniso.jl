@@ -1,9 +1,12 @@
 using ParaMag
 using LinearAlgebra
+using DelimitedFiles
 
 datafolder = ARGS[1]
-outfile = ARGS[2]
-Ln_list = ARGS[3:end]
+Ln_file = ARGS[2]
+chi_ax_file = ARGS[3]
+chi_rh_file = ARGS[4]
+Ln_list = ARGS[5:end]
 
 atomic_numbers = Dict("La" => 57, "Ce" => 58, "Pr" => 59, "Nd" => 60, "Pm" => 61,
                       "Sm" => 62, "Eu" => 63, "Gd" => 64, "Tb" => 65, "Dy" => 66,
@@ -64,6 +67,6 @@ for (i,Ln) in enumerate(Ln_list_sorted)
     chi_ax_matrix[i,3], chi_rh_matrix[i,3] = chi_ax_rhombicity_exact(sh, T)
 end
 
-println(Ln_list_sorted)
-display(chi_ax_matrix)
-display(chi_rh_matrix)
+writedlm(Ln_file, Ln_list_sorted)
+writedlm(chi_ax_file, chi_ax_matrix)
+writedlm(chi_rh_file, chi_rh_matrix)

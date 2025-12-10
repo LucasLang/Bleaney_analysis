@@ -7,7 +7,7 @@ Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list
 
 rule all:
     input: 
-        "dummyfile",
+        "results/susctable/susctable.tex",
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
         expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
         "results/TM/S_1/E_0/D_3/error_analysis_plot.png",
@@ -19,11 +19,23 @@ rule all:
         "results/TM/S_2.5/E_0/D_3/error_analysis_plot.png",
         "results/TM/S_2.5/E_0/D_3/h_plot.png"
 
-rule susc_aniso:
+rule calc_susc_aniso:
+    input:
+        expand("data/Bkq_{Ln}_real", Ln=Ln_wildcards)
     output:
-        "dummyfile"
+        "results/susctable/Ln_list",
+        "results/susctable/chi_ax",
+        "results/susctable/chi_rh"
     shell:
         "julia scripts/susc_aniso.jl data {output} {Ln_wildcards}"
+
+rule write_table_susc:
+    input:
+        "results/susctable/Ln_list",
+        "results/susctable/chi_ax",
+        "results/susctable/chi_rh"
+    output:
+        "results/susctable/susctable.tex"
 
 rule create_finitediff_functions:
     output:
