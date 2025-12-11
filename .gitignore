@@ -1,3 +1,4 @@
 workflow/results
 workflow/.snakemake
 workflow/logs
+workflow/scripts/__pycache__

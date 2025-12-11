@@ -7,8 +7,8 @@ Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list
 
 rule all:
     input: 
-        "results/susctable/chi_ax.png",
-        "results/susctable/chi_rh.png",
+        "results/suscplot/chi_ax.png",
+        "results/suscplot/chi_rh.png",
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
         expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
         "results/TM/S_1/E_0/D_3/error_analysis_plot.png",
@@ -24,19 +24,19 @@ rule calc_susc_aniso:
     input:
         expand("data/Bkq_{Ln}_real", Ln=Ln_wildcards)
     output:
-        "results/susctable/Ln_list",
-        "results/susctable/chi_ax",
-        "results/susctable/chi_rh"
+        "results/suscplot/Ln_list",
+        "results/suscplot/chi_ax",
+        "results/suscplot/chi_rh"
     shell:
         "julia scripts/susc_aniso.jl data {output} {Ln_wildcards}"
 
 rule plot_chi_ax:
     input:
-        "results/susctable/Ln_list",
-        "results/susctable/chi_ax",
+        "results/suscplot/Ln_list",
+        "results/suscplot/chi_ax",
         "data/chi_ax_CASSCF"
     output:
-        "results/susctable/chi_ax.png"
+        "results/suscplot/chi_ax.png"
     conda:
         "envs/matplotlib.yaml"
     shell:
@@ -44,11 +44,11 @@ rule plot_chi_ax:
 
 rule plot_chi_rh:
     input:
-        "results/susctable/Ln_list",
-        "results/susctable/chi_rh",
+        "results/suscplot/Ln_list",
+        "results/suscplot/chi_rh",
         "data/chi_rh_CASSCF"
     output:
-        "results/susctable/chi_rh.png"
+        "results/suscplot/chi_rh.png"
     conda:
         "envs/matplotlib.yaml"
     shell:
