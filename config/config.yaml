@@ -4,5 +4,5 @@ Ln_Tmin: 100
 Ln_Tmax: 500
 Ln_Tinterval: 50
 h_minexp: -1
-h_maxexp: 5
+h_maxexp: 4
 
