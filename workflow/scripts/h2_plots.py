@@ -15,7 +15,7 @@ h_vals = [10**h for h in range(h_minexp, h_maxexp + 1)]
 data_matrix = np.loadtxt(h_norms_file)   # Shape: hvals x 3
 
 # Plotting
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(5,3))
 
 beta_labels = [r'$\beta^1$', r'$\beta^2$', r'$\beta^3$'] 
 
@@ -27,8 +27,8 @@ for i in range(0,Norders):
 # Set axes and labels
 ax.set_xscale('log')  # Logarithmic scale for h values
 ax.set_yscale('log')  # Logarithmic scale for norm values
-ax.set_xlabel("h Values")
-ax.set_ylabel("Relative Error Values")
+ax.set_xlabel(r"h / Ha$^{-1}$")
+ax.set_ylabel("Relative error")
 ax.legend(title="Beta Terms", loc='best')
 
 plt.tight_layout()

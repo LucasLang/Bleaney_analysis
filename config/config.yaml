@@ -3,6 +3,6 @@ finitediff_file: "results/finitediff_functions.jl"
 Ln_Tmin: 100
 Ln_Tmax: 500
 Ln_Tinterval: 50
-h_minexp: -5
-h_maxexp: 4
+h_minexp: -1
+h_maxexp: 5
 
