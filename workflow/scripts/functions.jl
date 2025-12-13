@@ -6,32 +6,18 @@ function calc_dyadics_beta(sh, β)
     return calc_dyadic(sh, 1 / (ParaMag.kB * β))
 end
 
-function calc_dyadics_over_beta(sh, β)
-    return calc_dyadics_beta(sh, β) * 1/β
-end
-
-function generate_gk_values(sh, function_names, h::Float64)
+function generate_derivatives(sh, function_names, h::Float64)
     gk_values = []  # To store the function results and preserve order
 
     # Loop over the function names
     for fn_name in function_names
-        approximation_result = fn_name(β -> calc_dyadics_over_beta(sh, β), h)
+        approximation_result = fn_name(β -> calc_dyadics_beta(sh, β), h)
 
         # Store the result
 	push!(gk_values, approximation_result)
     end
     
-    return gk_values
-end
-
-# this only gives the derivative (temperature-independent)
-function generate_numderiv_dyadic(gk_values)
-    n_order = length(gk_values)  # Determine order based on number of elements in gk_values
-
-    # Generate derivative_dyadic_k for each k starting from 1 (derivative_dyadic_1 = g1, derivative_dyadic_2 = 2 * g2, etc.)
-    derivatives = [k * gk_values[k] for k in 1:n_order]
-
-    return derivatives
+    return gk_values[2:end]   # exclude the first value, which is just the dyadic at beta=0 (which is zero)
 end
 
 #########################################################################################
@@ -54,7 +40,7 @@ end
 function run_dyadics(shparam, temperatures)
     sh = ParaMag.SpinHamiltonian(shparam)
 
-    gk_values = generate_gk_values(sh, function_names, h)
+    num_derivatives = generate_derivatives(sh, function_names, h)
 
     all_diff_norms = []
     for T in temperatures
@@ -64,7 +50,6 @@ function run_dyadics(shparam, temperatures)
         # exact Dyadics
         exact_dyadic = calc_dyadic(sh, T)
 
-        num_derivatives = generate_numderiv_dyadic(gk_values)
         # for the first three, we use analytical derivatives, for the next three numerical
         derivatives = [ParaMag.JJbeta(shparam), ParaMag.JJbeta2(shparam), ParaMag.JJbeta3(shparam),
                     num_derivatives[4], num_derivatives[5], num_derivatives[6]]
@@ -105,9 +90,7 @@ function run_hnorms(shparam, h_minexp, h_maxexp)
     hnumber = length(hrange)
     h_norms = Array{Float64}(undef, hnumber, 3)
     for (i,h) in enumerate(hrange)
-        gk_values = generate_gk_values(sh, function_names, h)
-
-        derivatives = generate_numderiv_dyadic(gk_values)
+        derivatives = generate_derivatives(sh, function_names, h)
 
         Sans_total = Sans_beta + Sans_beta2 + Sans_beta3
 
