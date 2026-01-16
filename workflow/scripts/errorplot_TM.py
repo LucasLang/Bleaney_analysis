@@ -34,7 +34,7 @@ data_matrix = np.loadtxt(diff_norms_file)
 beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$', r'$\beta^6$']
 
 # Create figure and axes with larger size
-plt.figure(figsize=(10,6))
+plt.figure(figsize=(8,5))
 
 ax = plt.gca()
 
@@ -59,16 +59,14 @@ S_frac = Fraction(twotimesS, 2)  # Fraction objects nicely interpolate into stri
 # Main plot formatting
 ax.set_yscale('log')
 ax.set_ylim(1e-14, 1e6)
-ax.set_xlabel("Highest-order Term in the Expansion", fontsize=14, fontweight='bold')
-ax.set_ylabel("Relative Error Values", fontsize=14, fontweight='bold')
-#ax.set_title(f"TM", fontsize=14, fontweight='bold', pad=20)
+ax.set_xlabel("Highest-order term in the expansion")
+ax.set_ylabel("Relative error")
 ax.grid(True, which="both", ls="-", alpha=0.2)
-ax.tick_params(axis='both', which='major', labelsize=15)
+#ax.tick_params(axis='both', which='major', labelsize=15)
 
 # First legend (D/kT values)
 handles, labels = ax.get_legend_handles_labels()
-first_legend = ax.legend(handles, labels, title="D/kT", 
-          title_fontsize=14, fontsize=12,
+first_legend = ax.legend(handles, labels, title=r"$D/k_\mathrm{B}T$",
           loc='lower left',
           bbox_to_anchor=(0.01, 0.09),
           borderaxespad=0,
@@ -79,15 +77,14 @@ first_legend = ax.legend(handles, labels, title="D/kT",
 
 
 # Create dummy lines without actual lines for the second legend
-dummy1 = plt.Line2D([], [], linestyle='none', label=f"E/D = {E_over_D_fraction}")
-dummy2 = plt.Line2D([], [], linestyle='none', label=f"S = {S_frac}")
+dummy1 = plt.Line2D([], [], linestyle='none', label=fr"$E/D = {E_over_D_fraction}$")
+dummy2 = plt.Line2D([], [], linestyle='none', label=fr"$S = {S_frac}$")
 
 # Second legend (E/D as fraction and S)
 secondary_legend = ax.legend(
     handles=[dummy1, dummy2],
     loc='lower left', 
-    frameon=True, 
-    fontsize=13
+    frameon=True
 )
 
 ax.add_artist(first_legend)  
