@@ -21,8 +21,9 @@ beta_labels = [r'$\beta^1$', r'$\beta^2$', r'$\beta^3$']
 
 # Plot each row in data_matrix (norms for each beta term)
 Norders = data_matrix.shape[1]
-for i in range(0,Norders):
-    ax.plot(h_vals, data_matrix[:,i], marker='o', label=beta_labels[i])
+colors = ['tab:blue', 'tab:orange', 'tab:green']
+for (i,color) in zip(range(0,Norders), colors):
+    ax.plot(h_vals, data_matrix[:,i], marker='o', label=beta_labels[i], color=color)
 
 # Set axes and labels
 ax.set_xscale('log')  # Logarithmic scale for h values

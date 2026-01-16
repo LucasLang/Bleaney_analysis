@@ -8,7 +8,7 @@ def barplot_chi(rowlabels, columnlabels, data, ylabel, outfile):
     fig, ax = plt.subplots(figsize=(5, 3))
 
     # Colors for each method
-    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
+    colors = ['tab:orange', 'tab:green', 'tab:red', 'tab:purple']
 
     # Plot each method's bars
     for i, (method, color) in enumerate(zip(columnlabels, colors)):

@@ -3,14 +3,14 @@ outfile = ARGS[2]
 
 max_order = num_stencils-1 
 # Ensure num_stencils is even and valid
-if num_stencils % 2 != 0 || num_stencils < 2
-    error("num_stencils must be an even number greater than or equal to 2")
+if num_stencils < 2
+    error("number of stencil points must be at least 2!")
 end
 
 # Define symmetric stencil points
 half_points = num_stencils ÷ 2
-stencil_points = collect(-half_points:half_points)
-stencil_points = stencil_points[stencil_points .!= 0]  # Exclude zero
+n_max = (num_stencils-1)/2
+stencil_points = collect(-n_max:n_max)
 
 # Number of stencil points
 n = length(stencil_points)
