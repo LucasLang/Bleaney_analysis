@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-from barplot import barplot_chi
+from py_functions import barplot_chi
 
 Ln_list_file = sys.argv[1]
 chi_ax_file = sys.argv[2]

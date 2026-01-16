@@ -18,7 +18,8 @@ rule all:
         "results/TM/S_1/E_0/D_-3/error_analysis_plot.png",
         "results/TM/S_1/E_0/D_-3/h_plot.png",
         "results/TM/S_2.5/E_0/D_3/error_analysis_plot.png",
-        "results/TM/S_2.5/E_0/D_3/h_plot.png"
+        "results/TM/S_2.5/E_0/D_3/h_plot.png",
+        "results/h_plot_TM_Ln_2in1.png"
 
 rule calc_susc_aniso:
     input:
@@ -105,7 +106,21 @@ rule h_plot:
         h_minexp = config['h_minexp'],
         h_maxexp = config['h_maxexp']
     shell:
-        "python scripts/h2_plots.py {params.h_minexp} {params.h_maxexp} {input} {output}"
+        "python scripts/h_plots.py {params.h_minexp} {params.h_maxexp} {input} {output}"
+
+rule h_plot_2in1:
+    input:
+        "results/TM/S_1/E_0/D_3/h_norms.txt",
+        "results/Ln/Yb/h_norms.txt"
+    output:
+        "results/h_plot_TM_Ln_2in1.png"
+    conda:
+        "envs/matplotlib.yaml"
+    params:
+        h_minexp = config['h_minexp'],
+        h_maxexp = config['h_maxexp']
+    shell:
+        "python scripts/h_plots_2in1.py {params.h_minexp} {params.h_maxexp} {input} {output}"
 
 rule optimize_h:
     input:

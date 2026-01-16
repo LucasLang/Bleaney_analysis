@@ -25,3 +25,23 @@ def barplot_chi(rowlabels, columnlabels, data, ylabel, outfile):
 
     plt.tight_layout()
     plt.savefig(outfile, dpi=300)
+
+def plot_error_vs_h(ax, h_vals, h_norms_file, legend=True):
+    data_matrix = np.loadtxt(h_norms_file)   # Shape: hvals x 3
+
+    beta_labels = ['1', '2', '3'] 
+
+    # Plot each row in data_matrix (norms for each beta term)
+    Norders = data_matrix.shape[1]
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
+    for (i,color) in zip(range(0,Norders), colors):
+        ax.plot(h_vals, data_matrix[:,i], marker='o', label=beta_labels[i], color=color)
+
+    # Set axes and labels
+    ax.set_xscale('log')  # Logarithmic scale for h values
+    ax.set_yscale('log')  # Logarithmic scale for norm values
+    ax.set_xlabel(r"$h$ / Ha$^{-1}$")
+    ax.set_ylabel("Relative error")
+    ax.set_xticks(h_vals)
+    if legend:
+        ax.legend(title="Derivative order", loc='best')
