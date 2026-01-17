@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+from matplotlib.offsetbox import AnchoredText
 import sys
 
 Tmin = int(sys.argv[1])
@@ -23,8 +24,11 @@ norm = mcolors.LogNorm(vmin=min(temps), vmax=max(temps))
 cmap = cm.viridis
 colors = [cmap(norm(t)) for t in temps]
 
-# --- figure/axes ---
-fig, ax = plt.subplots(figsize=(10, 6))
+fig = plt.figure(figsize=(5,3), layout = "constrained")
+gs = fig.add_gridspec(nrows=1, ncols=2, width_ratios=[0.8, 0.2])
+ax = fig.add_subplot(gs[0, 0])
+ax_legend = fig.add_subplot(gs[0, 1])
+ax_legend.axis("off")
 
 # --- plot each temperature curve ---
 for i, (temp_data, color) in enumerate(zip(data_matrix, colors)):
@@ -33,41 +37,30 @@ for i, (temp_data, color) in enumerate(zip(data_matrix, colors)):
 # --- axes formatting ---
 ax.set_yscale('log')
 ax.set_ylim(1e-5, 1e1)
-ax.set_xlabel("Highest-order Term in the Expansion", fontsize=12, fontweight='bold')
-ax.set_ylabel("Relative Error Values", fontsize=12, fontweight='bold')
+ax.set_xlabel("Highest-order term in the expansion")
+ax.set_ylabel("Relative error")
 ax.grid(True, which="major", ls="-", alpha=0.2)
 ax.tick_params(axis='y', which='minor', length=0)
 
 # --- temperature legend (two columns) ---
 handles, labels = ax.get_legend_handles_labels()
-temp_leg = ax.legend(
+ax_legend.legend(
     handles, labels,
-    title="Temperatures in Kelvin",
-    ncol=2,
-    loc='lower left',
-    bbox_to_anchor=(0.02, 0.08),
-    fontsize=10,
-    title_fontsize=11,
-    frameon=True,
-    fancybox=True,
-    shadow=True,
-    columnspacing=1.2,
-    handlelength=1.8,
-    handletextpad=0.6,
-    borderaxespad=0.0,
-    labelspacing=0.5
+    title=r"$T$/K",
+    loc='center',
+    frameon=True
 )
-ax.add_artist(temp_leg)
 
-# --- tidy header ABOVE the legend (robust text, not a second legend) ---
-# Align left edges by using the same x in axes coordinates; lift y a bit above the legend
-ax.text(
-    0.05, 0.35, rf"Lanthanoid: {ln}",
-    transform=ax.transAxes,
-    fontsize=12,
-    fontweight='bold',
-    va='bottom', ha='left'
+plotlabels = f"{ln}(III)"
+at = AnchoredText(
+    plotlabels,
+    loc="lower left",
+    frameon=True,
+    borderpad=0.6,
+    pad=0.4,
 )
+
+ax.add_artist(at)
 
 plt.tight_layout()
 

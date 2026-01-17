@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
+from matplotlib.offsetbox import AnchoredText
 import numpy as np
 import sys
 from fractions import Fraction
@@ -34,9 +35,12 @@ data_matrix = np.loadtxt(diff_norms_file)
 beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$', r'$\beta^6$']
 
 # Create figure and axes with larger size
-plt.figure(figsize=(8,5))
+fig = plt.figure(figsize=(5,3), layout = "constrained")
+gs = fig.add_gridspec(nrows=1, ncols=2, width_ratios=[0.8, 0.2])
 
-ax = plt.gca()
+ax = fig.add_subplot(gs[0, 0])
+ax_legend = fig.add_subplot(gs[0, 1])
+ax_legend.axis("off")
 
 # --- colors by temperature (log-normalized) ---
 norm = mcolors.LogNorm(vmin=min(temps), vmax=max(temps))
@@ -66,28 +70,24 @@ ax.grid(True, which="both", ls="-", alpha=0.2)
 
 # First legend (D/kT values)
 handles, labels = ax.get_legend_handles_labels()
-first_legend = ax.legend(handles, labels, title=r"$D/k_\mathrm{B}T$",
-          loc='lower left',
-          bbox_to_anchor=(0.01, 0.09),
+ax_legend.legend(handles, labels, title=r"$D/k_\mathrm{B}T$",
+          loc='center',
+          #bbox_to_anchor=(0.01, 0.09),
           borderaxespad=0,
-          frameon=True,
-          fancybox=True,
-          shadow=True)
+          frameon=True)
 
+plotlabels = fr"""$E/D = {E_over_D_fraction}$
+$S = {S_frac}$"""
 
-
-# Create dummy lines without actual lines for the second legend
-dummy1 = plt.Line2D([], [], linestyle='none', label=fr"$E/D = {E_over_D_fraction}$")
-dummy2 = plt.Line2D([], [], linestyle='none', label=fr"$S = {S_frac}$")
-
-# Second legend (E/D as fraction and S)
-secondary_legend = ax.legend(
-    handles=[dummy1, dummy2],
-    loc='lower left', 
-    frameon=True
+at = AnchoredText(
+    plotlabels,
+    loc="lower left",
+    frameon=True,
+    borderpad=0.6,
+    pad=0.4,
 )
 
-ax.add_artist(first_legend)  
+ax.add_artist(at)
 
 plt.tight_layout()
 
