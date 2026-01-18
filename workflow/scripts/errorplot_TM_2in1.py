@@ -27,10 +27,10 @@ beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$'
 
 # Create figure and axes with larger size
 fig = plt.figure(figsize=(6.7, 3), layout="constrained")
-gs = fig.add_gridspec(nrows=1, ncols=3, width_ratios=[0.45, 0.45, 0.1])
+gs = fig.add_gridspec(nrows=2, ncols=2, height_ratios=[0.18, 1.0])
 
-axes = [fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1])]
-ax_legend = fig.add_subplot(gs[0, 2])
+axes = [fig.add_subplot(gs[1, 0]), fig.add_subplot(gs[1, 1])]
+ax_legend = fig.add_subplot(gs[0, :])
 ax_legend.axis("off")
 
 # --- colors by temperature (log-normalized) ---
@@ -68,7 +68,8 @@ ax_legend.legend(handles, labels, title=r"$D/k_\mathrm{B}T$",
           loc='center',
           #bbox_to_anchor=(0.01, 0.09),
           borderaxespad=0,
-          frameon=True)
+          frameon=True,
+          ncol = 3)
 
 
 plt.tight_layout()
