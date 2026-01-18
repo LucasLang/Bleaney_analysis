@@ -59,3 +59,12 @@ def convergence_plot(ax, beta_terms, data_matrix, formatted_labels, temps, norm)
     ax.set_xlabel("Highest-order term in the expansion")
     ax.set_ylabel("Relative error")
     ax.grid(True, which="both", ls="-", alpha=0.2)
+
+def sci_label(x, sig=2):
+    """Return a MathText string like r'$m\times10^{e}$' for a number x."""
+    if x == 0 or not np.isfinite(x):
+        return r"$0$"
+    exp = int(np.floor(np.log10(abs(x))))
+    mant = x / (10 ** exp)
+    # Keep the sign with the mantissa
+    return rf"${mant:.{sig}f}\times 10^{{{exp}}}$"

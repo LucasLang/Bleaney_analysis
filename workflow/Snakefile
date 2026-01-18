@@ -19,7 +19,8 @@ rule all:
         "results/TM/S_1/E_0/D_-3/h_plot.png",
         "results/TM/S_2.5/E_0/D_3/error_analysis_plot.png",
         "results/TM/S_2.5/E_0/D_3/h_plot.png",
-        "results/h_plot_TM_Ln_2in1.png"
+        "results/h_plot_TM_Ln_2in1.png",
+        "results/TM/error_analysis_plot_2in1_1_0_3_2.5_0_3.png"
 
 rule calc_susc_aniso:
     input:
@@ -182,3 +183,16 @@ rule dyadic_plot_TM:
         "envs/matplotlib.yaml"
     shell:
         "python scripts/errorplot_TM.py {wildcards.S} {wildcards.E} {wildcards.D} {input[0]} {input[1]} {output}"
+
+rule dyadic_plot_TM_2in1:
+    input:
+        "results/TM/S_{S1}/E_{E1}/D_{D1}/diff_norms.txt",
+        "results/TM/S_{S1}/E_{E1}/D_{D1}/T.txt",
+        "results/TM/S_{S2}/E_{E2}/D_{D2}/diff_norms.txt",
+        "results/TM/S_{S2}/E_{E2}/D_{D2}/T.txt"
+    output:
+        "results/TM/error_analysis_plot_2in1_{S1}_{E1}_{D1}_{S2}_{E2}_{D2}.png"
+    conda:
+        "envs/matplotlib.yaml"
+    shell:
+        "python scripts/errorplot_TM_2in1.py {wildcards.S1} {wildcards.E1} {wildcards.D1} {input[0]} {input[1]} {wildcards.S2} {wildcards.E2} {wildcards.D2} {input[2]} {input[3]} {output}"

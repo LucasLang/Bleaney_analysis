@@ -30,9 +30,9 @@ function generate_temperature(temp_ratio, D)
 end
 
 if D > 0
-    temp_ratio = [3e-2, 1e-1, 3e-1, 1.0, 3.0, 10.0] #10.0 .^ (-2:1:1) 
+    temp_ratio = [3e-2, 1e-1, 3e-1, 1.0, 3.0, 10.0]  
 else
-    temp_ratio = [-3e-2, -1e-1, -3e-1, -1.0, -3.0, -10.0] #-10.0 .^ (-2:1:1) # if D < 0
+    temp_ratio = [-3e-2, -1e-1, -3e-1, -1.0, -3.0, -10.0] # if D < 0
 end
 
 T = generate_temperature.(temp_ratio, D)

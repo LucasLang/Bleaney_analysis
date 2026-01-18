@@ -4,16 +4,7 @@ from matplotlib.offsetbox import AnchoredText
 import numpy as np
 import sys
 from fractions import Fraction
-from py_functions import convergence_plot
-
-def sci_label(x, sig=2):
-    """Return a MathText string like r'$m\times10^{e}$' for a number x."""
-    if x == 0 or not np.isfinite(x):
-        return r"$0$"
-    exp = int(np.floor(np.log10(abs(x))))
-    mant = x / (10 ** exp)
-    # Keep the sign with the mantissa
-    return rf"${mant:.{sig}f}\times 10^{{{exp}}}$"
+from py_functions import convergence_plot, sci_label
 
 k = 3.166811563e-6 
 conversion_factor = 219474.63
@@ -25,7 +16,6 @@ D = int(sys.argv[3])
 diff_norms_file = sys.argv[4]
 Tpointsfile = sys.argv[5]
 error_analysis_plot_file = sys.argv[6]
-
 
 temps = np.loadtxt(Tpointsfile)
 

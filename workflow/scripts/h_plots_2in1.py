@@ -15,7 +15,6 @@ results_dir = "results"
 
 h_vals = [10**h for h in range(h_minexp, h_maxexp + 1)]
 # Plotting
-fig, ax = plt.subplots(figsize=(5,3))
 fig, axes = plt.subplots(
     nrows=1,
     ncols=2,
