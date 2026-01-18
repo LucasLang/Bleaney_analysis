@@ -20,7 +20,8 @@ rule all:
         "results/TM/S_2.5/E_0/D_3/error_analysis_plot.png",
         "results/TM/S_2.5/E_0/D_3/h_plot.png",
         "results/h_plot_TM_Ln_2in1.png",
-        "results/TM/error_analysis_plot_2in1_1_0_3_2.5_0_3.png"
+        "results/TM/error_analysis_plot_2in1_1_0_3_2.5_0_3.png",
+        "results/Ln/error_analysis_plot_2in1_Ho_Yb.png"
 
 rule calc_susc_aniso:
     input:
@@ -161,7 +162,7 @@ rule calc_run_TM:
 
 rule dyadic_plot_Ln:
     input:
-        "results/Ln/{system}/diff_norms.txt",
+        "results/Ln/{system}/diff_norms.txt"
     output:
         "results/Ln/{system}/error_analysis_plot.png"
     conda:
@@ -172,6 +173,21 @@ rule dyadic_plot_Ln:
         Tinterval = config['Ln_Tinterval']
     shell:
         "python scripts/errorplot_Ln.py {params.Tmin} {params.Tmax} {params.Tinterval} {input} {wildcards.system} {output}"
+
+rule dyadic_plot_Ln_2in1:
+    input:
+        "results/Ln/{ln1}/diff_norms.txt",
+        "results/Ln/{ln2}/diff_norms.txt"
+    output:
+        "results/Ln/error_analysis_plot_2in1_{ln1}_{ln2}.png"
+    conda:
+        "envs/matplotlib.yaml"
+    params:
+        Tmin = config['Ln_Tmin'],
+        Tmax = config['Ln_Tmax'],
+        Tinterval = config['Ln_Tinterval']
+    shell:
+        "python scripts/errorplot_Ln_2in1.py {params.Tmin} {params.Tmax} {params.Tinterval} {input[0]} {wildcards.ln1} {input[1]} {wildcards.ln2} {output}"
 
 rule dyadic_plot_TM:
     input:
