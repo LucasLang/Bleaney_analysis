@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.cm as cm
 
 def barplot_chi(rowlabels, columnlabels, data, ylabel, outfile):
     x = np.arange(len(rowlabels))  # this is a dummy number that is not displayed in the plot
@@ -45,3 +46,16 @@ def plot_error_vs_h(ax, h_vals, h_norms_file, legend=True):
     ax.set_xticks(h_vals)
     if legend:
         ax.legend(title="Derivative order", loc='best')
+
+def convergence_plot(ax, beta_terms, data_matrix, formatted_labels, temps, norm):
+    cmap = cm.viridis
+    colors = [cmap(norm(t)) for t in temps]
+
+    # Plotting with improved visibility
+    for i, (temp_data, color) in enumerate(zip(data_matrix, colors)):
+        ax.plot(beta_terms, temp_data, marker='o', label=formatted_labels[i], 
+                color=color)
+    ax.set_yscale('log')
+    ax.set_xlabel("Highest-order term in the expansion")
+    ax.set_ylabel("Relative error")
+    ax.grid(True, which="both", ls="-", alpha=0.2)

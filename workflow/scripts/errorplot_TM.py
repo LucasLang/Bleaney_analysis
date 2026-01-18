@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-import matplotlib.cm as cm
 from matplotlib.offsetbox import AnchoredText
 import numpy as np
 import sys
 from fractions import Fraction
+from py_functions import convergence_plot
 
 def sci_label(x, sig=2):
     """Return a MathText string like r'$m\times10^{e}$' for a number x."""
@@ -44,15 +44,9 @@ ax_legend.axis("off")
 
 # --- colors by temperature (log-normalized) ---
 norm = mcolors.LogNorm(vmin=min(temps), vmax=max(temps))
-cmap = cm.viridis
-colors = [cmap(norm(t)) for t in temps]
-
-# Plotting with improved visibility
-for i, (temp_data, color) in enumerate(zip(data_matrix, colors)):
-    temperature_ratio = D / (kB * temps[i])
-    formatted_label = sci_label(float(temperature_ratio), sig=2)
-    ax.plot(beta_terms, temp_data, marker='o', label=formatted_label, 
-            color=color, linewidth=2, markersize=8)
+temperature_ratios = [D / (kB * T) for T in temps]
+formatted_labels = [sci_label(float(T_ratio), sig=2)for T_ratio in temperature_ratios]
+convergence_plot(ax, beta_terms, data_matrix, formatted_labels, temps, norm)
 
 # Convert to fraction
 E_over_D_fraction = Fraction(E,D)
@@ -61,12 +55,7 @@ twotimesS = int(2*S)
 S_frac = Fraction(twotimesS, 2)  # Fraction objects nicely interpolate into strings
 
 # Main plot formatting
-ax.set_yscale('log')
 ax.set_ylim(1e-14, 1e6)
-ax.set_xlabel("Highest-order term in the expansion")
-ax.set_ylabel("Relative error")
-ax.grid(True, which="both", ls="-", alpha=0.2)
-#ax.tick_params(axis='both', which='major', labelsize=15)
 
 # First legend (D/kT values)
 handles, labels = ax.get_legend_handles_labels()
