@@ -2,11 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
 
-def barplot_chi(rowlabels, columnlabels, data, ylabel, outfile):
+def barplot_chi(ax, rowlabels, columnlabels, data, ylabel, legend=True):
     x = np.arange(len(rowlabels))  # this is a dummy number that is not displayed in the plot
     width = 0.18  # width of each bar
-
-    fig, ax = plt.subplots(figsize=(5, 3))
 
     # Colors for each method
     colors = ['tab:orange', 'tab:green', 'tab:red', 'tab:purple']
@@ -20,12 +18,11 @@ def barplot_chi(rowlabels, columnlabels, data, ylabel, outfile):
     ax.set_xticks(x)
     ax.set_xticklabels(rowlabels)
     ax.set_ylabel(ylabel)
-    ax.legend(frameon=False)
+    if legend==True:
+        ax.legend(frameon=False)
     ax.set_xlim(x[0] - 0.5, x[-1] + 0.5)
     ax.tick_params(direction='in', top=True, right=True)
 
-    plt.tight_layout()
-    plt.savefig(outfile, dpi=300)
 
 def plot_error_vs_h(ax, h_vals, h_norms_file, legend=True):
     data_matrix = np.loadtxt(h_norms_file)   # Shape: hvals x 3
