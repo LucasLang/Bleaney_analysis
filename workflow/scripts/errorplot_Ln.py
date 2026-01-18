@@ -20,7 +20,7 @@ data_matrix = np.loadtxt(diff_norms_file)
 beta_terms = [r'$\beta$', r'$\beta^2$', r'$\beta^3$', r'$\beta^4$', r'$\beta^5$', r'$\beta^6$']
 
 # --- colors by temperature (log-normalized) ---
-norm = mcolors.LogNorm(vmin=min(temps), vmax=max(temps))
+norm = mcolors.Normalize(vmin=min(temps), vmax=max(temps))
 cmap = cm.viridis
 colors = [cmap(norm(t)) for t in temps]
 
