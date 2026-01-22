@@ -43,33 +43,14 @@ for q in range(-1, -1+Ncomp_vector):
 
 D2D2_2_Cartesian = A.H*D2D2_2_uncoupled*A.T.H
 
-print("\nCartesian form of (D2xD2)^2 tensor:")
-print("xx: ", sp.simplify(D2D2_2_Cartesian[0,0]))
-print("yy: ", sp.simplify(D2D2_2_Cartesian[1,1]))
-print("zz: ", sp.simplify(D2D2_2_Cartesian[2,2]))
-print("xy: ", sp.simplify(D2D2_2_Cartesian[0,1]))
-print("xz: ", sp.simplify(D2D2_2_Cartesian[0,2]))
-print("yz: ", sp.simplify(D2D2_2_Cartesian[1,2]))
-
 Dsquared = Dtensor * Dtensor
 
 Dsquared_aniso = Dsquared - (Dsquared.trace()/3)*sp.Matrix([[1,0,0], [0,1,0], [0,0,1]])
-print()
-print("D2_aniso xx: ", sp.simplify(sp.expand(Dsquared_aniso[0,0])))
-print("D2_aniso yy: ", sp.simplify(sp.expand(Dsquared_aniso[1,1])))
-print("D2_aniso zz: ", sp.simplify(sp.expand(Dsquared_aniso[2,2])))
-print("D2_aniso xy: ", sp.simplify(sp.expand(Dsquared_aniso[0,1])))
-print("D2_aniso xz: ", sp.simplify(sp.expand(Dsquared_aniso[0,2])))
-print("D2_aniso yz: ", sp.simplify(sp.expand(Dsquared_aniso[1,2])))
 
-print()
-print("Ratio xx: ", sp.simplify(sp.expand(D2D2_2_Cartesian[0,0])/ sp.expand(Dsquared_aniso[0,0])))
-print("Ratio yy: ", sp.simplify(sp.expand(D2D2_2_Cartesian[1,1])/ sp.expand(Dsquared_aniso[1,1])))
-print("Ratio zz: ", sp.simplify(sp.expand(D2D2_2_Cartesian[2,2])/ sp.expand(Dsquared_aniso[2,2])))
-print("Ratio xy: ", sp.simplify(sp.expand(D2D2_2_Cartesian[0,1])/ sp.expand(Dsquared_aniso[0,1])))
-print("Ratio xz: ", sp.simplify(sp.expand(D2D2_2_Cartesian[0,2])/ sp.expand(Dsquared_aniso[0,2])))
-print("Ratio yz: ", sp.simplify(sp.expand(D2D2_2_Cartesian[1,2])/ sp.expand(Dsquared_aniso[1,2])))
-
+print("\nRatio of the Cartesian form of (D2xD2)^2 and (D^2)^aniso:")
+for i in range(0,3):
+    for j in range(i,3):
+        print(f"Element ({i},{j}): ", sp.simplify(sp.expand(D2D2_2_Cartesian[i,j])/ sp.expand(Dsquared_aniso[i,j])))
 
 D2D2_0 = calc_D2xD2(0, 0)
 B2B2_0_uncoupled = sp.zeros(3,3)
@@ -80,15 +61,13 @@ for q in range(-1, -1+Ncomp_vector):
 
 B2B2_0_Cartesian = A.H*B2B2_0_uncoupled*A.T.H
 
-print("\nCartesian form of (D2xD2)^0 tensor:")
-print("xx: ", sp.simplify(B2B2_0_Cartesian[0,0]))
-print("yy: ", sp.simplify(B2B2_0_Cartesian[1,1]))
-print("zz: ", sp.simplify(B2B2_0_Cartesian[2,2]))
-print("xy: ", sp.simplify(B2B2_0_Cartesian[0,1]))
-print("xz: ", sp.simplify(B2B2_0_Cartesian[0,2]))
-print("yz: ", sp.simplify(B2B2_0_Cartesian[1,2]))
+tr_Dsquared_times_I = Dsquared.trace()*sp.Matrix([[1,0,0], [0,1,0], [0,0,1]])
 
-print("\ntrace(D2): ", sp.expand(Dsquared.trace()))
+print("\nRatio of the Cartesian form of (D2xD2)^0 and tr(D^2)*I (for diagonal elements):")
+for i in range(0,3):
+    print(f"Element ({i},{i}): ", sp.simplify(sp.expand(B2B2_0_Cartesian[i,i]) / tr_Dsquared_times_I[i,i]))
 
-ratio = sp.simplify(sp.simplify(sp.expand(B2B2_0_Cartesian[0,0]) / sp.expand(Dsquared.trace())))
-print("\nRatio: ", ratio)
+print("\nOff-diagonal elements of the Cartesian form of (D2xD2)^0:")
+for i in range(0,3):
+    for j in range(i+1,3):
+        print(f"Element ({i},{j}): ", sp.simplify(sp.expand(B2B2_0_Cartesian[i,j])))
