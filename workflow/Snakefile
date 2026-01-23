@@ -2,6 +2,15 @@ configfile: "../config/config.yaml"
 
 import os
 from glob import glob
+from itertools import product
+from fractions import Fraction
+
+Dvalues = config["Dvalues"]
+E_over_D_values = config["E_over_D_values"]
+S_values = config["S_values"]
+combos = list(product(S_values, E_over_D_values, Dvalues))
+S_E_D_combinations = [(S, int(Fraction(E_over_D)*D), D) for (S, E_over_D, D) in combos]
+allS, allE, allD = zip(*S_E_D_combinations)
 
 Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list of strings containing the lanthanides
 
@@ -10,14 +19,8 @@ rule all:
         "results/suscplot/chi_ax_rh.png",
         expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
         expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
-        "results/TM/S_1/E_0/D_3/error_analysis_plot.png",
-        "results/TM/S_1/E_0/D_3/h_plot.png",
-        "results/TM/S_1/E_1/D_3/error_analysis_plot.png",
-        "results/TM/S_1/E_1/D_3/h_plot.png",
-        "results/TM/S_1/E_0/D_-3/error_analysis_plot.png",
-        "results/TM/S_1/E_0/D_-3/h_plot.png",
-        "results/TM/S_2.5/E_0/D_3/error_analysis_plot.png",
-        "results/TM/S_2.5/E_0/D_3/h_plot.png",
+        expand("results/TM/S_{S}/E_{E}/D_{D}/error_analysis_plot.png", zip, S=allS, E=allE, D=allD),
+        expand("results/TM/S_{S}/E_{E}/D_{D}/h_plot.png", zip, S=allS, E=allE, D=allD),
         "results/h_plot_TM_Ln_2in1.png",
         "results/TM/error_analysis_plot_2in1_1_0_3_2.5_0_3.png",    # 2in1 plot will not work for mixed positive and negative D! (because only one legend is displayed)
         "results/Ln/error_analysis_plot_2in1_Ho_Yb.png"
