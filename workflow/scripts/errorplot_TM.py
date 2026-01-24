@@ -35,7 +35,7 @@ ax_legend.axis("off")
 # --- colors by temperature (log-normalized) ---
 norm = mcolors.LogNorm(vmin=min(temps), vmax=max(temps))
 temperature_ratios = [D / (kB * T) for T in temps]
-formatted_labels = [sci_label(float(T_ratio), sig=2)for T_ratio in temperature_ratios]
+formatted_labels = [sci_label(float(T_ratio), sig=1) for T_ratio in temperature_ratios]
 convergence_plot(ax, beta_terms, data_matrix, formatted_labels, temps, norm)
 
 # Convert to fraction

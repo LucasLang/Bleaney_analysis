@@ -17,12 +17,12 @@ Ln_wildcards = glob_wildcards("data/Bkq_{Ln}_real").Ln   # this will give a list
 rule all:
     input: 
         "results/suscplot/chi_ax_rh.png",
-        expand("results/Ln/{Ln}/error_analysis_plot.png", Ln=Ln_wildcards),
-        expand("results/Ln/{Ln}/h_plot.png", Ln=Ln_wildcards),
-        expand("results/TM/S_{S}/E_{E}/D_{D}/error_analysis_plot.png", zip, S=allS, E=allE, D=allD),
-        expand("results/TM/S_{S}/E_{E}/D_{D}/h_plot.png", zip, S=allS, E=allE, D=allD),
+        expand("results/Ln/{Ln}/error_analysis_plot_{Ln}.png", Ln=Ln_wildcards),
+        expand("results/Ln/{Ln}/h_plot_{Ln}.png", Ln=Ln_wildcards),
+        expand("results/TM/S_{S}/E_{E}/D_{D}/error_analysis_plot_S_{S}_E_{E}_D_{D}.png", zip, S=allS, E=allE, D=allD),
+        expand("results/TM/S_{S}/E_{E}/D_{D}/h_plot_S_{S}_E_{E}_D_{D}.png", zip, S=allS, E=allE, D=allD),
         "results/h_plot_TM_Ln_2in1.png",
-        "results/TM/error_analysis_plot_2in1_1_0_3_2.5_0_3.png",    # 2in1 plot will not work for mixed positive and negative D! (because only one legend is displayed)
+        "results/TM/error_analysis_plot_2in1_1_0_6_2.5_0_6.png",    # 2in1 plot will not work for mixed positive and negative D! (because only one legend is displayed)
         "results/Ln/error_analysis_plot_2in1_Ho_Yb.png"
 
 rule calc_susc_aniso:
@@ -89,11 +89,24 @@ rule calc_hnorms_TM:
     shell:
         "julia scripts/h_sans_beta_TM.jl {params.h_minexp} {params.h_maxexp} {input.last} {input[0]} {wildcards.S} {output}"
 
-rule h_plot:
+rule h_plot_TM:
     input:
-        "results/{folder}/h_norms.txt"
+        "results/TM/S_{S}/E_{E}/D_{D}/h_norms.txt"
     output:
-        "results/{folder}/h_plot.png"
+        "results/TM/S_{S}/E_{E}/D_{D}/h_plot_S_{S}_E_{E}_D_{D}.png"
+    conda:
+        "envs/matplotlib.yaml"
+    params:
+        h_minexp = config['h_minexp'],
+        h_maxexp = config['h_maxexp']
+    shell:
+        "python scripts/h_plots.py {params.h_minexp} {params.h_maxexp} {input} {output}"
+
+rule h_plot_Ln:
+    input:
+        "results/Ln/{system}/h_norms.txt"
+    output:
+        "results/Ln/{system}/h_plot_{system}.png"
     conda:
         "envs/matplotlib.yaml"
     params:
@@ -156,7 +169,7 @@ rule dyadic_plot_Ln:
     input:
         "results/Ln/{system}/diff_norms.txt"
     output:
-        "results/Ln/{system}/error_analysis_plot.png"
+        "results/Ln/{system}/error_analysis_plot_{system}.png"
     conda:
         "envs/matplotlib.yaml"
     params:
@@ -186,7 +199,7 @@ rule dyadic_plot_TM:
         "results/TM/S_{S}/E_{E}/D_{D}/diff_norms.txt",
         "results/TM/S_{S}/E_{E}/D_{D}/T.txt"
     output:
-        "results/TM/S_{S}/E_{E}/D_{D}/error_analysis_plot.png"
+        "results/TM/S_{S}/E_{E}/D_{D}/error_analysis_plot_S_{S}_E_{E}_D_{D}.png"
     conda:
         "envs/matplotlib.yaml"
     shell:
