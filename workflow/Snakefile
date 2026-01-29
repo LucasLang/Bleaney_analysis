@@ -117,7 +117,7 @@ rule h_plot_Ln:
 
 rule h_plot_2in1:
     input:
-        "results/TM/S_1/E_0/D_3/h_norms.txt",
+        "results/TM/S_1/E_0/D_6/h_norms.txt",
         "results/Ln/Yb/h_norms.txt"
     output:
         "results/h_plot_TM_Ln_2in1.png"

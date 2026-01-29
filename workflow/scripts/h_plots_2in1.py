@@ -25,7 +25,7 @@ plot_error_vs_h(axes[0], h_vals, h_norms_file_TM, legend=False)    # it is suffi
 plot_error_vs_h(axes[1], h_vals, h_norms_file_Ln)
 
 label_size = mpl.rcParams['axes.labelsize']
-axes[0].set_title(r"$S=0$, $D=3$ cm$^{-1}$, $E/D=0$", fontsize=label_size)
+axes[0].set_title(r"$S=1$, $D=6$ cm$^{-1}$, $E/D=0$", fontsize=label_size)  # Careful: title chosen manually!
 axes[1].set_title("Yb(III) complex", fontsize=label_size)
 
 
